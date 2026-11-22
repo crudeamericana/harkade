@@ -924,7 +924,7 @@
     const events = game?.events || [];
     $("#feed").textContent = events.length
       ? `${events[0].emoji || "✳"} ${events[0].name || "Crew"} ${events[0].text || "reacted"}`
-      : "Waiting for the chaos…";
+      : "Send a reaction to the crew.";
   }
   function sendProgress(finished = false) {
     if (!game || game.mode !== "online" || !run) return;
@@ -1215,16 +1215,16 @@
         : "CLEAN SURFACE";
     $("#resultTitle").textContent = online
       ? winner?.id === localId
-        ? "Deep End legend."
+        ? "You led the crew."
         : `${winner?.name || "Somebody"} made it out.`
       : busted
-        ? "The trench said nope."
-        : "That’s a clean exit.";
+        ? "Dive lost."
+        : "Safely surfaced.";
     $("#resultCopy").textContent = online
-      ? "Same trench. Different nerve. Your bank stays yours; race score is just for the receipts."
+      ? "Results show each diver’s banked haul. Your personal bank remains yours."
       : busted
         ? `You reached ${fmt(run.depth / 5)}m and lost ${fmt(run.lostLoot || 0)} loose shells. Your banked stash is untouched.`
-        : `You surfaced at ${fmt(run.depth / 5)}m and banked ${fmt(run.payout)} shells. ${run.depth > 760 ? "Deep greed, solid exit." : "The deep is still calling."}`;
+        : `You surfaced at ${fmt(run.depth / 5)}m and banked ${fmt(run.payout)} shells.`;
     $("#againButton").textContent = online
       ? hostMode
         ? "ONE MORE DIVE"
@@ -1864,8 +1864,8 @@
     );
     $("#oxygenFill").style.background =
       run.oxygen < 25
-        ? "linear-gradient(90deg,#ff836f,#ffd27d)"
-        : "linear-gradient(90deg,#57dfcc,#d2ff75)";
+        ? "#ed8c66"
+        : "#9dd5c8";
     $("#hullHud").textContent =
       "♥ ".repeat(Math.max(0, run.hull)).trim() || "♡";
     $("#depthTicker b").textContent = String(meters).padStart(3, "0");
@@ -1883,7 +1883,7 @@
     $("#actionCopy").textContent =
       run.oxygen < 25
         ? "O₂ CRITICAL. Find an air pocket or surface now."
-        : `Depth ${z} · x${m.toFixed(1)} payout · don't get greedy.`;
+        : `Surface now to bank ${fmt(run.loot * m)} shells · ×${m.toFixed(1)} multiplier.`;
     if (game?.mode === "online") renderRoom();
   }
   function dash() {
