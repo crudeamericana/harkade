@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#07131b" />
+    <meta name="description" content="A tiny multiplayer Minesweeper remix about loot, clues, and knowing when to cash out." />
+    <title>DEEP END — Harkade</title>
+    <link rel="stylesheet" href="game.css" />
+    <script defer src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js" integrity="sha384-nlUQ8ZqCbvStErob+biJNzSgltf6urV3VGqhfIfzhmg9RXmpeRm76ELw0pYnKlTR" crossorigin="anonymous"></script>
+    <script defer src="game.js"></script>
+  </head>
+  <body>
+    <div class="backdrop" aria-hidden="true">
+      <div class="backdrop__glow backdrop__glow--one"></div>
+      <div class="backdrop__glow backdrop__glow--two"></div>
+      <div class="backdrop__grain"></div>
+    </div>
+    <main class="app">
+      <header class="topbar">
+        <a class="brand" href="#home" aria-label="Harkade home"><span class="brand__mark">H</span><span>HARKADE</span></a>
+        <div class="topbar__right"><span class="new-drop"><i></i> FRESH DROP</span><span class="topbar__divide"></span><span class="topbar__series">GAME 02</span></div>
+      </header>
+
+      <section id="home" class="screen home-screen" aria-labelledby="title">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="eyebrow__spark">✳</span> A classic with trust issues</div>
+          <h1 id="title" class="wordmark">DEEP<br /><span>END</span><b>.</b></h1>
+          <p class="lede">Minesweeper got a group chat.<br />Everybody wants the loot. Nobody wants the boom.</p>
+          <div class="rule-pills" aria-label="Game rules"><span>3 digs max</span><span>Cash out anytime</span><span>Clues are real</span></div>
+          <label class="name-label" for="nickname">Your name in the group chat</label>
+          <input id="nickname" class="text-input name-input" maxlength="14" autocomplete="nickname" value="Diver" />
+          <div class="home-actions">
+            <button id="playSolo" class="button button--primary"><span>Run it solo</span><span class="button__arrow">↗</span></button>
+            <button id="createRoom" class="button button--secondary"><span>Make a room</span><span class="button__arrow">＋</span></button>
+          </div>
+          <div class="join-row">
+            <input id="roomCode" class="text-input" maxlength="80" aria-label="Room code" placeholder="Got a room code? Paste it" autocomplete="off" />
+            <button id="joinRoom" class="button button--quiet">Join <span aria-hidden="true">→</span></button>
+          </div>
+          <p class="fineprint">No real-money bets. Just pixels, pride, and an extremely questionable decision to dig again.</p>
+          <p id="homeNotice" class="notice" aria-live="polite"></p>
+        </div>
+
+        <div class="hero-art" aria-label="A preview of the shared treasure field">
+          <div class="art-stamp"><span class="stamp-dot"></span> FIELD REPORT <b>01 / 04</b></div>
+          <div class="art-card">
+            <div class="art-card__top"><span>THE TRENCH</span><span class="depth-tag">DEPTH 01</span></div>
+            <div class="preview-grid" aria-hidden="true">
+              <i class="preview-tile p-wave"></i><i class="preview-tile p-wave"></i><i class="preview-tile p-open p-num">1</i><i class="preview-tile p-wave"></i><i class="preview-tile p-wave"></i>
+              <i class="preview-tile p-wave"></i><i class="preview-tile p-gem">✦</i><i class="preview-tile p-open p-num p-num--two">2</i><i class="preview-tile p-wave"></i><i class="preview-tile p-wave"></i>
+              <i class="preview-tile p-wave"></i><i class="preview-tile p-wave"></i><i class="preview-tile p-mine">✹</i><i class="preview-tile p-wave"></i><i class="preview-tile p-wave"></i>
+              <i class="preview-tile p-wave"></i><i class="preview-tile p-open p-num">1</i><i class="preview-tile p-wave"></i><i class="preview-tile p-relic">◆</i><i class="preview-tile p-wave"></i>
+              <i class="preview-tile p-wave"></i><i class="preview-tile p-wave"></i><i class="preview-tile p-wave"></i><i class="preview-tile p-wave"></i><i class="preview-tile p-wave"></i>
+            </div>
+            <div class="art-card__bottom"><span><b class="live-dot"></b> 4 divers in this field</span><span>LOOT ×2.0 <b>↑</b></span></div>
+          </div>
+          <div class="floating-note floating-note--top"><span class="note-icon">👀</span><span><b>YOUR TURN</b><small>the group is watching</small></span></div>
+          <div class="floating-note floating-note--bottom"><span class="note-icon note-icon--mint">✦</span><span><b>+8 SHARDS</b><small>bank it or keep digging?</small></span></div>
+          <div class="art-caption"><span>SCOUTING THE UNKNOWN</span><span>EST. 60 SECONDS / RUN</span></div>
+        </div>
+      </section>
+
+      <section id="table" class="screen table-screen" hidden aria-label="Game table">
+        <div class="game-header">
+          <button id="leaveGame" class="back-button" aria-label="Leave game">←</button>
+          <div class="game-header__title"><span class="game-header__kicker">HARKADE / DEEP END</span><b id="depthTitle">Depth 01</b></div>
+          <button id="shareRoom" class="share-button">↗ <span>Invite</span></button>
+        </div>
+        <div class="game-layout">
+          <aside class="sidebar">
+            <div class="pot-card">
+              <span class="panel-label">IN YOUR POCKET · AT RISK</span>
+              <div class="pot-line"><strong id="potValue">0</strong><span>shards</span></div>
+              <div class="pot-bottom"><span id="multiplierLabel">Your turn starts at ×1</span><span class="heat-mark">✳</span></div>
+            </div>
+            <div id="turnCard" class="turn-card" aria-live="polite"></div>
+            <div class="roster-card">
+              <div class="panel-heading"><span>THE CREW</span><span id="crewCount" class="crew-count">0</span></div>
+              <div id="roster" class="roster"></div>
+            </div>
+            <div class="reactions-card">
+              <div class="panel-heading"><span>TABLE TALK</span><span class="panel-label">tap to react</span></div>
+              <div class="reaction-row" aria-label="Send a reaction">
+                <button class="reaction" data-reaction="👀" aria-label="Eyes">👀</button>
+                <button class="reaction" data-reaction="💀" aria-label="Skull">💀</button>
+                <button class="reaction" data-reaction="🫡" aria-label="Salute">🫡</button>
+                <button class="reaction" data-reaction="🐸" aria-label="Frog">🐸</button>
+              </div>
+              <div id="feed" class="feed" aria-live="polite"></div>
+            </div>
+            <div class="tip-card"><span class="tip-mark">i</span><p><b>Read the numbers.</b> They count nearby mines. A clean dig bumps your multiplier. Bailing banks it. A boom wipes only this turn's pocket.</p></div>
+          </aside>
+
+          <section class="board-area" aria-label="Shared field">
+            <div id="lobbyPane" class="lobby-pane" hidden>
+              <div class="lobby-orb" aria-hidden="true"><span>✦</span><i></i><i></i><i></i></div>
+              <p class="eyebrow eyebrow--small">ROOM'S WARMING UP</p>
+              <h2>Text the group chat.<br /><span>Then start the dive.</span></h2>
+              <p class="lobby-copy">Share your invite link. This field is shared live, so every reveal changes the odds for everybody.</p>
+              <div class="invite-box"><span id="inviteCode">getting room code…</span><button id="copyInvite" class="button button--quiet">Copy link ↗</button></div>
+              <div id="lobbyRoster" class="lobby-roster"></div>
+              <button id="startGame" class="button button--primary lobby-start">Start the dive <span class="button__arrow">↗</span></button>
+              <p id="lobbyStatus" class="notice" aria-live="polite">Loading a private room…</p>
+            </div>
+
+            <div id="fieldPane" hidden>
+              <div class="field-heading">
+                <div><p class="eyebrow eyebrow--small">SHARED LOOT FIELD</p><h2 id="fieldTitle">Your move. No pressure.</h2></div>
+                <div class="field-meta"><span id="digsLeft" class="digs-chip">3 digs left</span><span id="mineCount" class="mine-chip">4 charges</span></div>
+              </div>
+              <div class="grid-wrap"><div id="grid" class="grid" role="grid" aria-label="Five by five treasure field"></div></div>
+              <div class="board-footer">
+                <p id="statusMessage" class="status-message" aria-live="polite">Pick a covered tile to dig.</p>
+                <button id="bank" class="button button--bank" disabled><span>Cash out &amp; pass</span><span class="button__arrow">→</span></button>
+              </div>
+              <p class="field-footnote"><span>✦</span> You share the map, not the loot. Revealed tiles are off-limits.</p>
+            </div>
+          </section>
+        </div>
+
+        <div id="roundModal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="roundTitle">
+          <div class="modal-card"><span class="modal-kicker">DEPTH CLEARED</span><h2 id="roundTitle">Round over</h2><p id="roundCopy" class="modal-copy"></p><div id="roundRecap" class="recap-list"></div><button id="nextRound" class="button button--primary">Drop deeper <span class="button__arrow">↗</span></button><p id="roundWait" class="notice" hidden>Waiting for the room host to start the next depth…</p></div>
+        </div>
+        <div id="gameOverModal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="overTitle">
+          <div class="modal-card"><span class="modal-kicker">THE FINAL TALLY</span><h2 id="overTitle">Dive complete.</h2><p id="overCopy" class="modal-copy"></p><div id="finalRecap" class="recap-list"></div><button id="playAgain" class="button button--primary">One more? <span class="button__arrow">↗</span></button><button id="shareScore" class="text-button">Copy the receipts ↗</button></div>
+        </div>
+      </section>
+
+      <footer class="footer"><span>DEEP END <i>·</i> A HARKADE ORIGINAL</span><span>NO CASH. ALL CHAOS.</span></footer>
+    </main>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>
