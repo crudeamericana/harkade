@@ -417,7 +417,7 @@
       #s-menu .x-center { gap: 12px; }
       @media (max-height: 700px) { #s-menu .x-center { gap: 9px; } #s-menu .x-btn--big { min-height: 52px; font-size: 18px; } #s-menu .x-logo { font-size: clamp(52px, 18vw, 96px); } }
     </style>
-    <script defer src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+    <script defer src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js" integrity="sha384-nlUQ8ZqCbvStErob+biJNzSgltf6urV3VGqhfIfzhmg9RXmpeRm76ELw0pYnKlTR" crossorigin="anonymous"></script>
   </head>
   <body>
     <div class="page" id="top">
@@ -839,6 +839,7 @@
         updateProj();
         renderBoard();
       }
+      function escTxt(s) { return String(s).replace(/[&<>"'`]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;", "`": "&#96;" }[c]; }); }
       function renderBoard() {
         var b = $("board");
         b.hidden = S.mode !== "party";
@@ -847,7 +848,7 @@
         you.round = S.round; you.score = S.score;
         var sorted = S.players.slice().sort(function (a, c) { return (a.out - c.out) || (c.round - a.round) || (c.score - a.score); });
         b.innerHTML = sorted.map(function (p, i) {
-          return '<div class="x-bot' + (p.isBot ? "" : " is-you") + (p.out ? " is-out" : "") + '" title="' + p.name + '"><b>' + (i + 1) + ". " + p.name + "</b><span>" + (p.out ? "💀 R" + p.round : "R" + p.round + " · <u>" + fmt(Math.round(p.score)) + "</u>") + "</span></div>";
+          return '<div class="x-bot' + (p.isBot ? "" : " is-you") + (p.out ? " is-out" : "") + '" title="' + escTxt(p.name) + '"><b>' + (i + 1) + ". " + escTxt(p.name) + "</b><span>" + (p.out ? "💀 R" + p.round : "R" + p.round + " · <u>" + fmt(Math.round(p.score)) + "</u>") + "</span></div>";
         }).join("");
       }
 
@@ -1224,7 +1225,13 @@
       function emote(e, who) {
         var el = document.createElement("div");
         el.className = "x-emote";
-        el.innerHTML = e + (who ? '<div style="font-size:12px;font-weight:600;color:var(--x-dim)">' + who + "</div>" : "");
+        el.appendChild(document.createTextNode(String(e)));
+        if (who) {
+          var w = document.createElement("div");
+          w.style.fontSize = "12px"; w.style.fontWeight = "600"; w.style.color = "var(--x-dim)";
+          w.textContent = String(who);
+          el.appendChild(w);
+        }
         el.style.right = 64 + Math.floor(Math.random() * 90) + "px";
         el.style.bottom = 120 + Math.floor(Math.random() * 160) + "px";
         if (e === "W") el.style.color = "var(--x-green)";
@@ -1591,6 +1598,10 @@
       .x-on__code { font: 800 56px/1 var(--sans); letter-spacing: 0.18em; color: var(--x-green); margin: 0; }
       .x-on__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
       .x-on__list li { border: 1px solid var(--x-line); border-radius: 10px; padding: 8px; font-size: 14px; }
+      .x-on__list li.x-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 2px 2px 8px; }
+      .x-on__list li.x-row span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .x-kick { flex: none; width: 40px; height: 36px; border: 0; border-radius: 8px; background: transparent; color: var(--x-dim); font: inherit; font-size: 14px; cursor: pointer; }
+      .x-kick:hover, .x-kick:focus-visible { background: var(--x-line); color: inherit; }
       .x-on__msg { color: var(--x-pink); font-size: 14px; min-height: 1.2em; margin: 0; }
       .x-toast { position: fixed; left: 50%; top: calc(16px + env(safe-area-inset-top)); transform: translateX(-50%); z-index: 80; background: #c2006d; color: #fff; padding: 10px 16px; border-radius: 99px; font: 700 14px/1.2 var(--sans); box-shadow: 0 0 24px #ff2d9555; }
       .x-bot { position: relative; }
@@ -1600,13 +1611,63 @@
       /* ---------- online multiplayer (PeerJS) ---------- */
       (function () {
         var CH = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789", DOWN = "online's down rn — try Vs Bots";
-        var O = { peer: null, conn: null, host: false, conns: {}, code: "", name: "", map: {}, list: [], started: false, ended: false, pend: false, seed: 0, inRoom: false, rejected: false };
+        var O = { peer: null, conn: null, host: false, conns: Object.create(null), seen: Object.create(null), banned: Object.create(null), emoT: Object.create(null), cb: null, myEmo: 0, bt: 0, lastB: 0, code: "", name: "", map: Object.create(null), list: [], started: false, ended: false, pend: false, seed: 0, inRoom: false, rejected: false };
         function rc(n) { var s = ""; for (var i = 0; i < n; i++) s += CH[Math.floor(Math.random() * CH.length)]; return s; }
         function funName() {
           var a = ["lowkey", "feral", "mid", "sigma", "goated", "unhinged", "cracked", "sleepy"], b = ["goblin", "dice", "rizzler", "unc", "gremlin", "npc", "bestie", "menace"];
           return a[Math.floor(Math.random() * a.length)] + "_" + b[Math.floor(Math.random() * b.length)] + Math.floor(Math.random() * 90 + 10);
         }
-        function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+        function esc(s) { return String(s).replace(/[&<>"'`]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;", "`": "&#96;" }[c]; }); }
+        function num(v) { v = +v; return isFinite(v) ? v : 0; }
+        /* clean:start — every inbound peer message passes through clean(d, dir) */
+        var EMOS = ["💀", "🔥", "😭", "W", "L"], PID = /^[A-Za-z0-9_-]{1,64}$/, CODE_RE = new RegExp("^[" + CH + "]{4}$");
+        var T_IN = { host: { hi: 1, st: 1, emo: 1 }, client: { ok: 1, no: 1, lobby: 1, start: 1, board: 1, emo: 1, end: 1 } };
+        var BAD_CH = /[\u0000-\u001F\u007F\u200B-\u200F\u202A-\u202E\u2066-\u2069]/g;
+        function own(o, k) { return Object.prototype.hasOwnProperty.call(o, k) ? o[k] : undefined; }
+        function isObj(o) { if (!o || typeof o !== "object" || Array.isArray(o)) return false; var p = Object.getPrototypeOf(o); return p === Object.prototype || p === null; }
+        function cStr(v, max) { return typeof v === "string" ? Array.from(v.replace(BAD_CH, "").trim()).slice(0, max).join("").trim() : ""; }
+        function cName(v) { return cStr(v, 16) || "player"; }
+        function cInt(v, lo, hi) { return typeof v === "number" && Math.floor(v) === v && v >= lo && v <= hi ? v : null; }
+        function cNum(v, lo, hi) { return typeof v === "number" && isFinite(v) && v >= lo && v <= hi ? v : null; }
+        function cBool(v) { return typeof v === "boolean" ? v : null; }
+        function cStat(o) {
+          var s = { round: cInt(own(o, "round"), 1, 99), score: cNum(own(o, "score"), 0, 1e12), coins: cInt(own(o, "coins"), 0, 1e6), alive: cBool(own(o, "alive")), done: cBool(own(o, "done")) };
+          for (var k in s) if (s[k] === null) return null;
+          return s;
+        }
+        function cEntry(o) { if (!isObj(o)) return null; var s = cStat(o); if (!s) return null; s.name = cName(own(o, "name")); if (own(o, "dc") === true) s.dc = true; return s; }
+        function cList(v) {
+          if (!Array.isArray(v) || v.length > 6) return null;
+          var out = [];
+          for (var i = 0; i < v.length; i++) { var e = cEntry(v[i]); if (!e) return null; out.push(e); }
+          return out;
+        }
+        function clean(d, dir) {
+          if (!isObj(d)) return null;
+          try { var j = JSON.stringify(d); if (typeof j !== "string" || j.length > 4096) return null; } catch (x) { return null; }
+          var t = own(d, "t"), ok = T_IN[dir], m, v;
+          if (typeof t !== "string" || !ok || !Object.prototype.hasOwnProperty.call(ok, t)) return null;
+          m = { t: t };
+          if (t === "hi" || t === "ok") m.name = cName(own(d, "name"));
+          else if (t === "st") { v = cStat(d); if (!v) return null; for (var k in v) m[k] = v[k]; }
+          else if (t === "emo") { v = own(d, "e"); if (EMOS.indexOf(v) < 0) return null; m.e = v; if (dir === "client") m.name = cName(own(d, "name")); }
+          else if (t === "no") m.why = cStr(own(d, "why"), 80) || "removed";
+          else if (t === "lobby") {
+            v = own(d, "names"); if (!Array.isArray(v) || v.length > 6) return null;
+            m.names = v.map(cName); m.code = own(d, "code");
+            if (typeof m.code !== "string" || !CODE_RE.test(m.code)) return null;
+          }
+          else if (t === "start") { m.seed = cInt(own(d, "seed"), 0, 4294967295); if (m.seed === null) return null; }
+          else { m.list = cList(own(d, "list")); if (!m.list) return null; }
+          return m;
+        }
+        /* clean:end */
+        function allow(b, burst, rate) {
+          var now = Date.now(); b.tk = Math.min(burst, b.tk + ((now - b.ts) / 1000) * rate); b.ts = now;
+          if (b.tk >= 1) { b.tk -= 1; return true; }
+          b.drop++; return false;
+        }
+        function bucket(n) { return { tk: n, ts: Date.now(), drop: 0, bad: 0, emo: 0 }; }
         var ov = document.createElement("div");
         ov.className = "x-on"; ov.hidden = true; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true"); ov.setAttribute("aria-label", "Play online");
         document.querySelector(".x-app").appendChild(ov);
@@ -1624,7 +1685,9 @@
         function readName() { var i = document.getElementById("x-name"); var n = i ? i.value.trim().slice(0, 16) : ""; O.name = n || O.name || funName(); }
         function leave() {
           try { if (O.peer) O.peer.destroy(); } catch (e) {}
-          O.peer = null; O.conn = null; O.conns = {}; O.map = {}; O.list = []; O.started = O.ended = O.inRoom = O.rejected = O.host = false;
+          O.peer = null; O.conn = null; O.conns = Object.create(null); O.map = Object.create(null); O.list = []; O.started = O.ended = O.inRoom = O.rejected = O.host = false;
+          O.seen = Object.create(null); O.banned = Object.create(null); O.emoT = Object.create(null); O.cb = null;
+          if (O.bt) { clearTimeout(O.bt); O.bt = 0; }
           if (S) S.online = false;
           $("again").hidden = false;
         }
@@ -1632,11 +1695,25 @@
         function names() { return Object.keys(O.map).map(function (k) { return O.map[k].name; }); }
         function bcast(m, except) { Object.keys(O.conns).forEach(function (k) { if (k !== except && O.conns[k].open) O.conns[k].send(m); }); }
         function listView(ns) { return '<ul class="x-on__list">' + ns.map(function (n) { return "<li>" + esc(n) + (n === O.name ? " (you)" : "") + "</li>"; }).join("") + "</ul>"; }
+        function hostList() {
+          return '<ul class="x-on__list">' + Object.keys(O.map).map(function (k) {
+            var n = O.map[k].name;
+            return k === "host" ? "<li>" + esc(n) + " (you)</li>" : '<li class="x-row"><span>' + esc(n) + '</span><button class="x-kick" data-a="kick" data-id="' + esc(k) + '" aria-label="Kick ' + esc(n) + '" title="Kick ' + esc(n) + '">✕</button></li>';
+          }).join("") + "</ul>";
+        }
+        function refuse(c, why) { try { c.send({ t: "no", why: why }); } catch (e) {} setTimeout(function () { try { c.close(); } catch (e) {} }, 400); }
+        function kick(id, why) {
+          var c = O.conns[id] || O.seen[id]; if (!c) return;
+          O.banned[id] = true;
+          refuse(c, why || "removed by host");
+          drop(c);
+        }
+        function kill(c) { try { c.close(); } catch (e) {} drop(c); }
         function lobby() {
           var ns = names();
           bcast({ t: "lobby", names: ns, code: O.code });
           view('<p class="x-dim">room code</p><p class="x-on__code">' + O.code + '</p><input id="x-inv" readonly aria-label="Invite text" value="join my LOADED! room: ' + O.code + '" />' +
-            '<button class="x-btn x-btn--ghost" data-a="copy">Copy Invite</button><p class="x-dim">' + ns.length + "/6 in the lobby</p>" + listView(ns) +
+            '<button class="x-btn x-btn--ghost" data-a="copy">Copy Invite</button><p class="x-dim">' + ns.length + "/6 in the lobby</p>" + hostList() +
             '<button class="x-btn x-btn--big x-btn--green" data-a="start"' + (ns.length < 2 ? " disabled" : "") + ">" + (ns.length < 2 ? "need 2+ to start" : "START") + '</button><button class="x-btn x-btn--ghost" data-a="back">Back</button>');
         }
         function create() {
@@ -1645,10 +1722,19 @@
           leave(); O.host = true; O.code = rc(4);
           view('<p class="x-dim">making a room…</p>');
           var p = new Peer("loaded-" + O.code); O.peer = p;
-          p.on("open", function () { O.map = { host: { id: "host", name: O.name, round: 1, score: 0, coins: 4, alive: true, done: false } }; lobby(); });
+          p.on("open", function () { O.map = Object.create(null); O.map.host = { id: "host", name: O.name, round: 1, score: 0, coins: 4, alive: true, done: false }; lobby(); });
           p.on("connection", function (c) {
-            c.on("data", function (d) { hostMsg(c, d); });
-            c.on("close", function () { drop(c); });
+            var id = c.peer;
+            // reject odd ids (e.g. "__proto__"), the reserved "host" key, and a second link from the same peer
+            if (O.peer !== p || typeof id !== "string" || !PID.test(id) || id === "host" || O.seen[id]) { try { c.close(); } catch (e) {} return; }
+            O.seen[id] = c; c._b = bucket(10);
+            c.on("open", function () {
+              if (O.banned[id]) return refuse(c, "removed by host");
+              if (O.started) return refuse(c, "already started 🏃 wait for the next one");
+              c._hiT = setTimeout(function () { if (O.conns[id] !== c) { try { c.close(); } catch (e) {} } }, 5000);
+            });
+            c.on("data", function (d) { if (O.seen[id] === c) hostMsg(c, d); });
+            c.on("close", function () { clearTimeout(c._hiT); if (O.seen[id] === c) delete O.seen[id]; drop(c); });
           });
           p.on("error", function (e) {
             if (O.peer !== p) return;
@@ -1656,27 +1742,43 @@
             if (O.started) toast("connection lost 📡"); else { leave(); err("connection lost 📡"); }
           });
         }
-        function hostMsg(c, d) {
-          if (!d || !d.t) return;
+        function hostMsg(c, raw) {
+          // token bucket before parsing: 10 burst, 3/s sustained; 50+ drops = disconnect
+          if (!allow(c._b, 10, 3)) { if (c._b.drop > 50) kill(c); return; }
+          var d = clean(raw, "host"), id = c.peer;
+          if (!d || O.banned[id]) return;
           if (d.t === "hi") {
+            if (O.conns[id]) return;
             var why = O.started ? "already started 🏃 wait for the next one" : names().length >= 6 ? "room full 🚪 (6 max)" : "";
-            if (why) { c.send({ t: "no", why: why }); return setTimeout(function () { c.close(); }, 400); }
-            var n = String(d.name || "player").slice(0, 16), base = n, k = 2;
-            while (names().indexOf(n) >= 0) n = base + k++;
-            O.conns[c.peer] = c;
-            O.map[c.peer] = { id: c.peer, name: n, round: 1, score: 0, coins: 4, alive: true, done: false };
+            if (why) return refuse(c, why);
+            clearTimeout(c._hiT);
+            var n = d.name, base = n, k = 2;
+            while (names().indexOf(n) >= 0) n = Array.from(base).slice(0, 14).join("") + k++;
+            O.conns[id] = c;
+            O.map[id] = { id: id, name: n, round: 1, score: 0, coins: 4, alive: true, done: false };
             c.send({ t: "ok", name: n });
             lobby();
-          } else if (d.t === "st" && O.map[c.peer]) {
-            ["round", "score", "coins", "alive", "done"].forEach(function (f) { O.map[c.peer][f] = d[f]; });
+            return;
+          }
+          var p = O.map[id];
+          if (O.conns[id] !== c || !p || p.dc) return;
+          if (d.t === "st") {
+            if (!O.started) return;
+            // sanity: round climbs by at most 1, score within a generous cap, out/done never flips back
+            var bad = d.round < p.round || d.round > p.round + 1 || d.score > targetFor(d.round) * 50 || (!p.alive && d.alive) || (p.done && !d.done);
+            if (bad) { if (++c._b.bad >= 3) kick(id, "kicked: stats didn't add up 🚫"); return; }
+            ["round", "score", "coins", "alive", "done"].forEach(function (f) { p[f] = d[f]; });
             boardOut();
-          } else if (d.t === "emo" && O.map[c.peer]) {
-            var m = { t: "emo", e: String(d.e).slice(0, 4), name: O.map[c.peer].name };
-            bcast(m, c.peer); pop(m.name, m.e);
+          } else if (d.t === "emo") {
+            var now = Date.now();
+            if (now - c._b.emo < 700) return;
+            c._b.emo = now;
+            var m = { t: "emo", e: d.e, name: p.name };
+            bcast(m, id); pop(m.name, m.e);
           }
         }
         function drop(c) {
-          if (!O.conns[c.peer]) return;
+          if (O.conns[c.peer] !== c) return;
           delete O.conns[c.peer];
           if (O.started) { O.map[c.peer].dc = true; boardOut(); } else { delete O.map[c.peer]; lobby(); }
         }
@@ -1701,7 +1803,8 @@
             var c = p.connect("loaded-" + code, { reliable: true }); O.conn = c;
             setTimeout(function () { if (O.peer === p && !c.open && !O.rejected) { leave(); err("room not found 🤷 check the code"); } }, 10000);
             c.on("open", function () { O.inRoom = true; c.send({ t: "hi", name: O.name }); });
-            c.on("data", clientMsg);
+            O.cb = bucket(30);
+            c.on("data", function (d) { if (O.conn === c) clientMsg(d); });
             c.on("close", function () { if (O.peer === p && !O.rejected && O.inRoom) hostLeft(); });
           });
           p.on("error", function (e) {
@@ -1710,15 +1813,23 @@
             else if (O.inRoom) hostLeft("connection lost 📡"); else { leave(); err("connection lost 📡"); }
           });
         }
-        function clientMsg(d) {
-          if (!d || !d.t) return;
+        function emoOk(name) { var now = Date.now(); if (now - (O.emoT[name] || 0) < 700) return false; O.emoT[name] = now; return true; }
+        function boardSoon() {
+          if (O.bt) return;
+          O.bt = setTimeout(function () { O.bt = 0; O.lastB = Date.now(); if (S && S.online) renderBoard(); }, Math.max(0, 250 - (Date.now() - O.lastB)));
+        }
+        function clientMsg(raw) {
+          // the host is untrusted too: 30 burst, 15/s; 50+ drops = leave
+          if (!O.cb || !allow(O.cb, 30, 15)) { if (O.cb && O.cb.drop > 50) hostLeft("host is spamming 🚫"); return; }
+          var d = clean(raw, "client");
+          if (!d) return;
           if (d.t === "ok") O.name = d.name;
           else if (d.t === "no") { O.rejected = true; leave(); err(esc(d.why)); }
           else if (d.t === "lobby") view('<p class="x-dim">room</p><p class="x-on__code">' + esc(d.code) + "</p>" + listView(d.names) + '<p class="x-dim">waiting for host…</p><button class="x-btn x-btn--ghost" data-a="back">Back</button>');
           else if (d.t === "start") go(d.seed);
-          else if (d.t === "board") { O.list = d.list || []; renderBoard(); }
-          else if (d.t === "emo") pop(d.name, d.e);
-          else if (d.t === "end") { O.ended = true; endView(d.list || []); }
+          else if (d.t === "board") { O.list = d.list; boardSoon(); }
+          else if (d.t === "emo") { if (emoOk(d.name)) pop(d.name, d.e); }
+          else if (d.t === "end") { O.ended = true; endView(d.list); }
         }
         function startGame() {
           O.seed = (Date.now() ^ (Math.random() * 1e9)) >>> 0;
@@ -1752,12 +1863,13 @@
           var s = list.slice().sort(function (a, b) { return (!!b.done - !!a.done) || ((b.round || 0) - (a.round || 0)) || ((b.score || 0) - (a.score || 0)); });
           var md = ["🥇", "🥈", "🥉"];
           view('<h2 class="x-title" style="font-size:36px">GG 🎲</h2><ul class="x-on__list">' + s.slice(0, 3).map(function (p, i) {
-            return "<li>" + md[i] + " <b>" + esc(p.name) + "</b> · " + (p.done ? "cleared all 8" : "R" + p.round) + " · " + fmt(p.score || 0) + "</li>";
+            return "<li>" + md[i] + " <b>" + esc(p.name) + "</b> · " + (p.done ? "cleared all 8" : "R" + Math.floor(num(p.round))) + " · " + esc(fmt(Math.round(num(p.score)))) + "</li>";
           }).join("") + "</ul>" + (O.host ? '<button class="x-btn x-btn--big x-btn--green" data-a="start">REMATCH</button>' : '<p class="x-dim">waiting for host…</p>') +
             '<button class="x-btn x-btn--ghost" data-a="menu">Leave room</button>');
         }
         var A = {
           create: create, join: join, start: startGame,
+          kick: function (b) { var id = b.getAttribute("data-id"); if (O.host && !O.started && id && O.conns[id]) kick(id, "removed by host"); },
           back: function () { leave(); menuView(); },
           close: function () { readName(); leave(); ov.hidden = true; },
           menu: function () { leave(); ov.hidden = true; $("fx").innerHTML = ""; show("s-menu"); },
@@ -1767,7 +1879,7 @@
             if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function () { toast("invite copied 📋"); }, fb); else fb();
           }
         };
-        ov.addEventListener("click", function (e) { var b = e.target.closest("[data-a]"); if (b && !b.disabled && A[b.dataset.a]) { SFX.click(); A[b.dataset.a](); } });
+        ov.addEventListener("click", function (e) { var b = e.target.closest("[data-a]"); if (b && !b.disabled && Object.prototype.hasOwnProperty.call(A, b.dataset.a)) { SFX.click(); A[b.dataset.a](b); } });
         // PeerJS loads with defer; if it isn't ready yet, wait up to 8s before calling it down
         $("go-online").onclick = function () {
           audio(); SFX.click();
@@ -1795,7 +1907,8 @@
           if (!S.xOut && !S.xDone) { me.round = S.round; me.score = S.score; }
           L.sort(function (a, c) { return ((!a.alive || a.dc) - (!c.alive || c.dc)) || (!!c.done - !!a.done) || ((c.round || 0) - (a.round || 0)) || ((c.score || 0) - (a.score || 0)); });
           b.innerHTML = L.map(function (p, i) {
-            var out = !p.alive || p.dc, st = p.dc ? "dc · R" + p.round : !p.alive ? "💀 R" + p.round : (p.done ? "🏁 " : "R" + p.round + " · ") + "<u>" + fmt(Math.round(p.score || 0)) + "</u>";
+            var r = Math.floor(num(p.round)), sc = esc(fmt(Math.round(num(p.score))));
+            var out = !p.alive || p.dc, st = p.dc ? "dc · R" + r : !p.alive ? "💀 R" + r : (p.done ? "🏁 " : "R" + r + " · ") + "<u>" + sc + "</u>";
             return '<div class="x-bot' + (p === me ? " is-you" : "") + (out ? " is-out" : "") + '" data-n="' + esc(p.name) + '" title="' + esc(p.name) + '"><b>' + (i + 1) + ". " + esc(p.name) + "</b><span>" + st + "</span></div>";
           }).join("");
         };
@@ -1816,6 +1929,8 @@
           if (!S || !S.online) return;
           if (type === "hand") report();
           if (type === "emote") {
+            if (EMOS.indexOf(p.e) < 0 || Date.now() - O.myEmo < 700) return;
+            O.myEmo = Date.now();
             pop(O.name, p.e);
             var m = { t: "emo", e: p.e, name: O.name };
             if (O.host) bcast(m); else if (O.conn && O.conn.open) O.conn.send(m);
