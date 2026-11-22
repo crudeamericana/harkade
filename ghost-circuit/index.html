@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#090c18" />
+    <meta name="description" content="Your last lap becomes the next obstacle. Race your own ghost or stack your crew's routes in Ghost Circuit, a fictional-shells arcade racer." />
+    <title>Ghost Circuit — Harkade</title>
+    <link rel="stylesheet" href="style.css" />
+    <script defer src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js" integrity="sha384-nlUQ8ZqCbvStErob+biJNzSgltf6urV3VGqhfIfzhmg9RXmpeRm76ELw0pYnKlTR" crossorigin="anonymous"></script>
+    <script defer src="game.js"></script>
+  </head>
+  <body>
+    <div class="ambient" aria-hidden="true"><i></i><i></i><i></i></div>
+    <main class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="./" aria-label="Ghost Circuit home">
+          <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 3 27 9.5v13L16 29 5 22.5v-13L16 3Z"/><path d="M11 19.5 16 11l5 8.5M13 16h6"/></svg></span>
+          <span>HARKADE <b>/</b> GHOST CIRCUIT</span>
+        </a>
+        <div class="top-right">
+          <a class="game-link" href="../deepend/">PLAY DEEP END <span aria-hidden="true">↗</span></a>
+          <button id="soundToggle" class="sound-toggle" type="button" aria-pressed="false" aria-label="Turn sound on">SOUND OFF</button>
+        </div>
+      </header>
+
+      <section id="homeScreen" class="screen home-screen" aria-labelledby="mainTitle">
+        <div class="home-grid">
+          <div class="hero-copy">
+            <p class="eyebrow"><span class="eyebrow-dot"></span> ARCADE RACER <span class="eyebrow-sep">/</span> FIELD GAME 03</p>
+            <h1 id="mainTitle">GHOST<br /><em>CIRCUIT</em><span class="title-mark">_</span></h1>
+            <p class="lede">Your last lap becomes<br />the next obstacle.</p>
+            <p class="body-copy">Chase sparks. Cut your own racing line. Then face the ghost of where you’ve been.</p>
+            <div class="feature-chips" aria-label="Game features">
+              <span><i aria-hidden="true">↻</i> ROUTE MEMORY</span>
+              <span><i aria-hidden="true">✦</i> FICTIONAL SHELLS</span>
+            </div>
+
+            <label class="field-label" for="nickname">RACER TAG <small>SHARED IN ROOMS</small></label>
+            <input id="nickname" class="name-input" maxlength="14" autocomplete="nickname" value="Racer" spellcheck="false" />
+            <div class="play-actions">
+              <button id="soloButton" class="btn btn-primary" type="button"><span>START SOLO</span><b aria-hidden="true">↗</b></button>
+              <button id="createRoom" class="btn btn-secondary" type="button"><span>OPEN A ROOM</span><b aria-hidden="true">＋</b></button>
+            </div>
+            <div class="join-row">
+              <input id="roomCode" class="room-input" maxlength="240" aria-label="Room invite link or code" placeholder="Paste a room link or code" autocomplete="off" spellcheck="false" />
+              <button id="joinRoom" class="btn btn-quiet" type="button">JOIN <span aria-hidden="true">↗</span></button>
+            </div>
+            <p id="homeNotice" class="notice" aria-live="polite"></p>
+            <p class="safe-note"><span aria-hidden="true">ⓘ</span> Fictional score only. No real money or purchases. Your bank and best stay on this device; rooms share racer tags and lap routes.</p>
+          </div>
+
+          <aside class="preview-card" aria-label="Ghost Circuit gameplay preview">
+            <div class="preview-head"><span><i class="live-dot"></i> CIRCUIT / LIVE FEED</span><span>01 — 05</span></div>
+            <div class="preview-frame">
+              <canvas id="previewCanvas" aria-label="Illustrated circuit with a racer, sparks, and a route ghost"></canvas>
+              <div class="preview-overlay" aria-hidden="true"><span>THE TRACK</span><b>REMEMBERS.</b><small>MOVE WITH INTENT.</small></div>
+              <div class="preview-coordinates" aria-hidden="true">SECTOR 03&nbsp;&nbsp; · &nbsp;&nbsp;GHOST TRACE DETECTED</div>
+            </div>
+            <div class="preview-stats">
+              <div><span>SAFE SHELLS</span><b><i>✦</i> <span id="homeBank">0</span></b></div>
+              <div><span>BEST LAP HAUL</span><b id="homeBest">—</b></div>
+              <div><span>ROOM CAPACITY</span><b>6 RACERS</b></div>
+            </div>
+            <div class="preview-foot"><span class="meter"><i></i><i></i><i></i><i></i><i></i></span><span>MEMORY ONLINE</span></div>
+          </aside>
+        </div>
+        <footer class="home-footer">
+          <div><span class="footer-index">CONTROL</span><span>DRAG THE LINE SLIDER <b>·</b> OR USE ← →</span></div>
+          <div><span class="footer-index">STRATEGY</span><span>BANK SAFELY <b>·</b> OR PUSH YOUR MULTIPLIER</span></div>
+          <div><span class="footer-index">HARKADE / 03</span><span>ONE THUMB. NO PAYWALLS. YOUR ROUTE, YOUR CALL.</span></div>
+        </footer>
+      </section>
+
+      <section id="lobbyScreen" class="screen lobby-screen" hidden aria-labelledby="lobbyTitle">
+        <div class="lobby-card">
+          <div class="lobby-kicker"><i class="live-dot"></i> PRIVATE ROOM SIGNAL</div>
+          <h2 id="lobbyTitle">CREW<br /><em>ASSEMBLE.</em></h2>
+          <p id="lobbyCopy" class="lobby-copy">Send the invite to your crew. Their past routes will haunt the circuit.</p>
+          <label class="field-label" for="inviteLink">ROOM INVITE <small>ANYONE WITH THIS LINK CAN JOIN</small></label>
+          <div class="invite-row"><input id="inviteLink" class="invite-input" readonly aria-label="Room invite link" /><button id="copyInvite" class="btn btn-secondary" type="button">COPY</button></div>
+          <div class="roster-head"><span>RACERS IN SIGNAL</span><span id="rosterCount">1 / 6</span></div>
+          <ul id="roster" class="roster" aria-live="polite"></ul>
+          <p id="lobbyNotice" class="notice" aria-live="polite"></p>
+          <div class="lobby-actions"><button id="startRoom" class="btn btn-primary" type="button">START CIRCUIT <b aria-hidden="true">↗</b></button><button id="leaveRoom" class="btn btn-quiet" type="button">LEAVE ROOM</button></div>
+          <p id="guestWaiting" class="waiting-copy" hidden>Waiting for the room host to start the circuit…</p>
+        </div>
+      </section>
+
+      <section id="gameScreen" class="screen game-screen" hidden aria-label="Ghost Circuit game">
+        <div class="game-head">
+          <button id="quitButton" class="icon-button" type="button" aria-label="Leave circuit">← <span>EXIT</span></button>
+          <div class="race-label"><span class="live-dot"></span><span id="modeLabel">SOLO / RUN</span></div>
+          <button id="pauseButton" class="icon-button" type="button" aria-label="Pause game">Ⅱ <span>PAUSE</span></button>
+        </div>
+        <div class="scorebar" aria-label="Race status">
+          <div class="score-cell"><span>LAP</span><b id="lapReadout">01 <i>/ 05</i></b></div>
+          <div class="score-cell"><span>UNBANKED</span><b id="potReadout"><i>✦</i> 0</b></div>
+          <div class="score-cell score-cell--accent"><span>PUSH MULTI</span><b id="multiReadout">×1.0</b></div>
+          <div class="score-cell"><span>SHIELDS</span><b id="shieldReadout">◆ ◆</b></div>
+        </div>
+        <div class="arena-shell">
+          <canvas id="gameCanvas" aria-label="Top-down oval race track. Steer between inner and outer lines to collect sparks and avoid replaying ghosts."></canvas>
+          <div class="arena-corner arena-corner--left"><span>ROUTE TRACE</span><b id="ghostReadout">NO GHOSTS YET</b></div>
+          <div class="arena-corner arena-corner--right"><span>SECTOR</span><b id="sectorReadout">01 / 12</b></div>
+          <p id="gameNotice" class="game-notice" aria-live="polite"></p>
+          <div id="lapDecision" class="decision-card" hidden role="dialog" aria-modal="true" aria-labelledby="decisionTitle">
+            <div class="decision-kicker"><span class="live-dot"></span> LINE RECORDED <span id="routeStamp">/ 01</span></div>
+            <h2 id="decisionTitle">LAP LOCKED.</h2>
+            <p id="decisionCopy">Your route is returning as a moving hazard. Bank your haul or risk another lap.</p>
+            <div class="decision-score"><span>SAFE BANK</span><b><i>✦</i> <span id="bankQuote">0</span></b><span>IF YOU CASH OUT NOW</span></div>
+            <div class="decision-actions"><button id="bankButton" class="btn btn-primary" type="button">BANK & FINISH <b aria-hidden="true">✓</b></button><button id="pushButton" class="btn btn-risk" type="button">PUSH <span id="pushQuote">×1.5</span> <b aria-hidden="true">↗</b></button></div>
+            <p class="risk-note">Pushed shells are fictional and unbanked. A wipeout loses this run’s unbanked haul; banked shells stay safe.</p>
+          </div>
+        </div>
+        <div class="drive-panel">
+          <div class="drive-labels"><span>INSIDE</span><span class="drive-instruction">ONE THUMB · DRAG TO PICK A LINE</span><span>OUTSIDE</span></div>
+          <input id="steer" class="steer-slider" type="range" min="-100" max="100" step="1" value="0" aria-label="Steer from inside to outside lane" />
+          <div class="drive-foot"><span>← → / A D WORK TOO</span><span id="sparkReadout">✦ 0 THIS LAP</span></div>
+        </div>
+
+        <div id="pauseOverlay" class="overlay" hidden role="dialog" aria-modal="true" aria-labelledby="pauseTitle">
+          <div class="overlay-card"><div class="decision-kicker">CIRCUIT PAUSED</div><h2 id="pauseTitle">TAKE A BREATHER.</h2><p>Your progress is safe while you’re paused.</p><button id="resumeButton" class="btn btn-primary" type="button">RESUME <b aria-hidden="true">↗</b></button></div>
+        </div>
+        <div id="resultOverlay" class="overlay" hidden role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+          <div class="overlay-card result-card"><div id="resultKicker" class="decision-kicker">RUN COMPLETE</div><h2 id="resultTitle">BANKED.</h2><p id="resultCopy">Your safe shells are tucked away.</p><div class="result-total"><span>SAFE SHELLS</span><b><i>✦</i> <span id="resultBank">0</span></b></div><button id="againButton" class="btn btn-primary" type="button">RUN IT BACK <b aria-hidden="true">↗</b></button><button id="homeButton" class="btn btn-quiet" type="button">BACK TO GARAGE</button></div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
