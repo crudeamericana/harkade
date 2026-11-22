@@ -1,0 +1,1828 @@
+<!doctype html>
+<html lang="en" data-theme="dark" style="background:#0d0718;color:#fff">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>LOADED!</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400&display=swap"
+      media="print"
+      onload="this.media='all'"
+    />
+    <link rel="stylesheet" href="hark.css" />
+    <link rel="stylesheet" href="hark-hero.css" />
+    <style>
+      :root {
+        --x-bg: #0b0616;
+        --x-bg2: #150a26;
+        --x-panel: #1b0f2e;
+        --x-panel2: #241440;
+        --x-pink: #ff2d95;
+        --x-green: #9dff3c;
+        --x-cyan: #2de2ff;
+        --x-gold: #ffc53d;
+        --x-ink: #f7f2ff;
+        --x-dim: #b9a6d9;
+        --x-line: #ffffff1f;
+      }
+      html, body { height: 100%; background: #0d0718 !important; color: #fff !important; color-scheme: dark; }
+      [hidden] { display: none !important; }
+      body {
+        background-image: radial-gradient(120% 80% at 50% 0%, #1a0b30 0%, #0d0718 60%) !important;
+        background-attachment: fixed;
+        overflow: hidden;
+        overscroll-behavior: none;
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .page { max-width: none; padding: 0; background: #0d0718; }
+      .x-app {
+        position: fixed;
+        inset: 0;
+        background: transparent;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        font-family: var(--sans);
+        padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      }
+      .x-screen {
+        position: absolute;
+        inset: 0;
+        display: none;
+        flex-direction: column;
+        gap: 10px;
+        padding: 14px 14px calc(14px + env(safe-area-inset-bottom));
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .x-screen.is-on { display: flex; animation: xin var(--dur-quick, 0.18s) var(--ease-out, ease-out); }
+      @keyframes xin { from { opacity: 0; transform: translateY(8px); } }
+      .x-title {
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        line-height: 0.92;
+        font-size: clamp(38px, 15vw, 72px);
+        text-transform: uppercase;
+        color: #fff;
+        text-shadow: 3px 3px 0 #ff2d95, -2px -2px 0 #2de2ff, 0 0 24px #ff2d9599;
+      }
+      .x-kicker { font: var(--type-tag); letter-spacing: 0.22em; text-transform: uppercase; color: var(--x-cyan); }
+      .x-dim { color: var(--x-dim); font-size: 13px; }
+      .x-center { margin: auto 0; display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }
+      .x-btn {
+        appearance: none;
+        border: 1px solid var(--x-line);
+        background: #2a1748;
+        color: #fff;
+        font: 600 15px/1 var(--sans);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        min-height: 48px;
+        padding: 0 18px;
+        border-radius: 14px;
+        cursor: pointer;
+        transition: transform 0.12s var(--ease-out, ease-out), filter 0.12s;
+      }
+      .x-btn:active { transform: scale(0.96); }
+      .x-btn[disabled] { opacity: 0.7; pointer-events: none; background: #241a33; color: #cfc4e0; border-color: #ffffff33; box-shadow: none; text-shadow: none; }
+      .x-btn--big { width: 100%; min-height: 60px; font-size: 20px; }
+      .x-btn--pink { background: #c2006d; border-color: #ff8ec8; color: #fff; text-shadow: 0 1px 2px #0008; box-shadow: 0 0 24px #ff2d9555; }
+      .x-btn[disabled] { filter: grayscale(0.4); }
+      .x-btn--green { background: #8fea2e; border-color: #d6ff9c; color: #0b1a04; box-shadow: 0 0 24px #9dff3c44; }
+      .x-btn--cyan { background: #3fdcf7; border-color: #a8f4ff; color: #04212a; }
+      .x-btn--ghost { background: #2a1748; border-color: #ffffff4d; color: #fff; }
+      .x-row { display: flex; gap: 10px; flex-wrap: wrap; }
+      .x-row--fill > .x-btn { flex: 1; }
+
+      /* HUD */
+      .x-hud { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+      .x-cell {
+        background: #ffffff0a;
+        border: 1px solid var(--x-line);
+        border-radius: 12px;
+        padding: 7px 8px;
+        text-align: center;
+      }
+      .x-cell b { display: block; font: 700 17px/1.1 var(--sans); font-variant-numeric: tabular-nums; }
+      .x-cell span { font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--x-dim); }
+      .x-goal { border-radius: 16px; border: 1px solid var(--x-line); padding: 10px 12px; background: #ffffff08; }
+      .x-goal.is-boss { border-color: var(--x-pink); box-shadow: 0 0 22px #ff2d9533 inset; }
+      .x-goal__top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+      .x-goal__score { font: 700 26px/1 var(--sans); font-variant-numeric: tabular-nums; color: var(--x-green); }
+      .x-bar { height: 7px; border-radius: 99px; background: #ffffff14; margin-top: 8px; overflow: visible; }
+      .x-bar > i { display: block; height: 100%; width: 0; border-radius: 99px; background: linear-gradient(90deg, var(--x-cyan), var(--x-green)); transition: width 0.4s var(--ease-out, ease-out), box-shadow 0.3s; }
+      .x-bar.is-filling > i { box-shadow: 0 0 10px #9dff3c, 0 0 24px #2de2ff99; }
+      .x-curse { margin-top: 6px; font-size: 12px; color: var(--x-pink); font-weight: 600; }
+
+      /* charms */
+      .x-charms { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; min-height: 54px; }
+      .x-charm {
+        flex: 0 0 auto;
+        width: 100px;
+        border-radius: 12px;
+        border: 1px solid var(--x-line);
+        background: var(--x-panel);
+        color: #fff;
+        padding: 6px;
+        font-size: 12px;
+        line-height: 1.15;
+        text-align: center;
+        cursor: pointer;
+      }
+      .x-charm i { display: block; font-size: 18px; font-style: normal; }
+      .x-charm b { display: block; font-size: 12px; font-weight: 700; }
+      .x-charm.r-common { border-color: #9aa0ad; }
+      .x-charm.r-rare { border-color: #4da3ff; box-shadow: 0 0 12px #4da3ff44; }
+      .x-charm.r-epic { border-color: #b061ff; box-shadow: 0 0 12px #b061ff55; }
+      .x-charm.r-legendary { border-color: var(--x-gold); box-shadow: 0 0 16px #ffc53d66; }
+      .x-charms { padding: 5px 4px 6px; margin: -5px -4px -4px; }
+      .x-charm, .x-offer { position: relative; overflow: hidden; }
+      .x-charm.r-common, .x-offer.r-common { box-shadow: 0 0 8px #9aa0ad33; }
+      .x-charm.r-rare, .x-offer.r-rare { box-shadow: 0 0 12px #4da3ff66, inset 0 0 12px #4da3ff22; }
+      .x-charm.r-epic, .x-offer.r-epic { box-shadow: 0 0 14px #b061ff99, inset 0 0 10px #b061ff2e; isolation: isolate; }
+      .x-charm.r-legendary, .x-offer.r-legendary { box-shadow: 0 0 14px #ffc53d99, inset 0 0 10px #ffc53d2e; isolation: isolate; background-image: linear-gradient(180deg, #3a2a10, var(--x-panel)); }
+      .x-charm.r-epic::before, .x-offer.r-epic::before, .x-charm.r-legendary::before, .x-offer.r-legendary::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none; box-shadow: inset 0 0 18px #b061ff66; opacity: 0; animation: xrglow 2.2s ease-in-out infinite; }
+      .x-charm.r-legendary::before, .x-offer.r-legendary::before { box-shadow: inset 0 0 18px #ffc53d77; animation-duration: 1.6s; }
+      @keyframes xrglow { 50% { opacity: 1; } }
+      .x-charm.r-legendary::after, .x-offer.r-legendary::after { content: ""; position: absolute; top: 0; bottom: 0; left: -60%; width: 50%; pointer-events: none; background: linear-gradient(100deg, transparent, #fff5 50%, transparent); transform: translateX(0) skewX(-20deg); animation: xshimmer 2.6s ease-in-out infinite; }
+      @keyframes xshimmer { 0% { transform: translateX(0) skewX(-20deg); } 55%, 100% { transform: translateX(420%) skewX(-20deg); } }
+      .x-charm.is-fire { animation: wig 0.4s ease-in-out; }
+      @keyframes wig { 0%,100% { transform: none; } 25% { transform: rotate(-7deg) scale(1.12); } 75% { transform: rotate(7deg) scale(1.12); } }
+      .x-empty { color: var(--x-dim); font-size: 12px; align-self: center; }
+
+      /* dice */
+      .x-stage { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 10px; }
+      .x-table { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; justify-content: center; gap: 6px; }
+      .x-handlabel { text-align: center; font: 700 clamp(17px, 5vw, 20px)/1.1 var(--sans); text-transform: uppercase; letter-spacing: 0.02em; margin: 0 0 6px; padding: 0 4px; overflow-wrap: anywhere; }
+      .x-handlabel small { display: block; font-size: clamp(12px, 3.3vw, 13px); line-height: 1.3; letter-spacing: 0.06em; color: var(--x-dim); margin-top: 4px; font-weight: 500; white-space: normal; }
+      .x-dice { display: flex; gap: 2vw; justify-content: center; align-items: flex-end; width: 100%; max-width: 100%; padding-top: 10px; }
+      .x-die {
+        flex: 0 0 auto;
+        width: min(17vw, calc((100% - 8vw) / 5), 72px);
+        aspect-ratio: 1;
+        min-width: 0;
+        border-radius: 22%;
+        background: linear-gradient(180deg, #fffdfb, #ddd3ea);
+        color: #180a26;
+        border: 2px solid #ffffff22;
+        display: block;
+        padding: 0;
+        cursor: pointer;
+        position: relative;
+        transition: transform 0.16s var(--ease-out, ease-out), box-shadow 0.16s;
+      }
+      .x-die { container-type: inline-size; --pip: 21cqi; }
+      .x-face { position: absolute; inset: 12.5%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); place-items: center; pointer-events: none; }
+      .x-face s, .x-face span { display: block; width: 84%; height: 84%; width: var(--pip); height: var(--pip); flex: none; border-radius: 50%; text-decoration: none; }
+      .x-face s { background: #12061f; box-shadow: inset 0 -1px 0 #ffffff22; }
+      .x-die.is-held { transform: translateY(-8px); box-shadow: 0 0 0 2px var(--x-green), 0 8px 22px #9dff3c66; }
+      .x-die.is-gold { background: linear-gradient(180deg, #ffe9a8, #ffb62e); box-shadow: 0 0 18px #ffc53d88; }
+      .x-die.is-gold.is-held { box-shadow: 0 0 0 2px var(--x-green), 0 0 22px #ffc53daa; }
+      .x-die.is-dead { opacity: 0.45; }
+      .x-die { --ly: 0px; }
+      .x-die.is-held { --ly: -8px; box-shadow: 0 0 0 2px var(--x-green), 0 0 10px #9dff3c88, 0 8px 22px #9dff3c44; }
+      .x-die::before { content: ""; position: absolute; inset: -2px; border-radius: inherit; pointer-events: none; box-shadow: 0 0 0 1px var(--x-green), 0 0 26px #9dff3ccc, 0 0 46px #2de2ff66; opacity: 0; }
+      .x-die.is-held::before { animation: xheldpulse 1.1s ease-in-out infinite; }
+      @keyframes xheldpulse { 50% { opacity: 1; } }
+      .x-die.is-roll { animation: tumble 0.72s cubic-bezier(0.22, 0.9, 0.3, 1) both; }
+      @keyframes tumble {
+        0% { transform: translateY(-70px) rotate(-300deg) scale(0.7); opacity: 0; }
+        42% { transform: translateY(6px) rotate(14deg) scale(1.06, 0.92); opacity: 1; }
+        60% { transform: translateY(-12px) rotate(-5deg) scale(0.98, 1.03); }
+        76% { transform: translateY(2px) rotate(2deg) scale(1.02, 0.97); }
+        89% { transform: translateY(-3px) rotate(0deg); }
+        100% { transform: none; }
+      }
+      .x-die.x-hit { animation: xhit 0.34s cubic-bezier(0.2, 1.6, 0.4, 1); }
+      @keyframes xhit { 0% { transform: translateY(var(--ly)) scale(1); } 40% { transform: translateY(calc(var(--ly) - 10px)) scale(1.28) rotate(-6deg); } 100% { transform: translateY(var(--ly)) scale(1); } }
+      .x-die em { position: absolute; top: -8px; right: -6px; font-style: normal; font-size: 11px; }
+
+      /* score pop */
+      .x-calc { text-align: center; font: 700 30px/1 var(--sans); font-variant-numeric: tabular-nums; min-height: 34px; }
+      .x-calc .c { color: var(--x-cyan); }
+      .x-calc .m { color: var(--x-pink); }
+      .x-calc .x { color: var(--x-dim); font-size: 20px; }
+      .x-shake { animation: shake var(--skd, 0.45s); }
+      @keyframes shake {
+        0%, 100% { transform: none; }
+        15% { transform: translate(calc(-7px * var(--sk, 1)), calc(4px * var(--sk, 1))) rotate(calc(-1deg * var(--sk, 1))); }
+        35% { transform: translate(calc(6px * var(--sk, 1)), calc(-5px * var(--sk, 1))) rotate(calc(1deg * var(--sk, 1))); }
+        55% { transform: translate(calc(-4px * var(--sk, 1)), calc(3px * var(--sk, 1))); }
+        75% { transform: translate(calc(2px * var(--sk, 1)), calc(-2px * var(--sk, 1))); }
+      }
+      .x-calc .is-flash { display: inline-block; animation: xflash 0.32s cubic-bezier(0.2, 1.6, 0.4, 1); }
+      .x-calc .is-flash-big { display: inline-block; animation: xflashbig 0.5s cubic-bezier(0.2, 1.6, 0.4, 1); }
+      @keyframes xflash { 0% { transform: scale(1); } 45% { transform: scale(1.3); text-shadow: 0 0 18px currentColor; } 100% { transform: scale(1); } }
+      @keyframes xflashbig { 0% { transform: scale(1); } 35% { transform: scale(1.7) rotate(-4deg); text-shadow: 0 0 26px currentColor, 0 0 50px currentColor; } 100% { transform: scale(1); } }
+      .x-slam { display: inline-block; font-size: 34px; color: var(--x-green); text-shadow: 0 0 18px #9dff3c99; animation: xslam 0.36s cubic-bezier(0.3, 1.5, 0.5, 1); }
+      @keyframes xslam { 0% { transform: scale(2.8) rotate(-8deg); opacity: 0; } 60% { transform: scale(0.92); opacity: 1; } 100% { transform: scale(1); } }
+      .x-float { position: absolute; left: 0; top: 0; font: 800 20px/1 var(--sans); font-variant-numeric: tabular-nums; text-shadow: 0 0 12px currentColor, 0 2px 2px #000a; white-space: nowrap; pointer-events: none; animation: xfloat 0.9s var(--ease-out, ease-out) forwards; }
+      @keyframes xfloat { 0% { opacity: 0; transform: translate(-50%, -40%) scale(0.5); } 20% { opacity: 1; transform: translate(-50%, -110%) scale(1.25); } 100% { opacity: 0; transform: translate(-50%, -280%) scale(1); } }
+      .x-spark { position: absolute; left: 0; top: 0; width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px; border-radius: 50%; background: var(--c, #9dff3c); box-shadow: 0 0 8px var(--c, #9dff3c); pointer-events: none; animation: xspark var(--sd, 0.6s) ease-out forwards; }
+      @keyframes xspark { 0% { transform: translate(var(--x0), var(--y0)) scale(1); opacity: 1; } 100% { transform: translate(calc(var(--x0) + var(--dx)), calc(var(--y0) + var(--dy))) scale(0.2); opacity: 0; } }
+      .x-coin { position: absolute; left: 0; top: 0; z-index: 2; font-size: 22px; line-height: 1; pointer-events: none; will-change: transform; filter: drop-shadow(0 0 6px #ffc53daa); }
+      .x-cell.is-bump b { animation: xflash 0.3s cubic-bezier(0.2, 1.6, 0.4, 1); color: var(--x-gold); }
+      .x-rays { position: absolute; left: 0; top: 0; width: 520px; height: 520px; border-radius: 50%; pointer-events: none; opacity: 0; mix-blend-mode: screen; background: repeating-conic-gradient(#fff6 0 6deg, transparent 6deg 22deg); -webkit-mask: radial-gradient(circle, transparent 0, #000 12%, #000 28%, transparent 68%); mask: radial-gradient(circle, transparent 0, #000 12%, #000 28%, transparent 68%); will-change: transform, opacity; }
+      .x-burst { position: absolute; left: 0; top: 0; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%; pointer-events: none; border: 6px solid var(--c); box-shadow: 0 0 40px var(--c), inset 0 0 30px var(--c); animation: xburstring 0.7s ease-out forwards; }
+      @keyframes xburstring { 0% { transform: translate(var(--x0), var(--y0)) scale(0.1); opacity: 1; } 100% { transform: translate(var(--x0), var(--y0)) scale(var(--bs, 4)); opacity: 0; } }
+      .x-fx { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 40; contain: layout paint; }
+      .x-fx > * { pointer-events: none; will-change: transform, opacity; }
+      button, .x-die, a { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+      html.x-paused *, html.x-paused *::before, html.x-paused *::after { animation-play-state: paused !important; }
+      .x-pop {
+        position: absolute;
+        left: 50%;
+        top: 42%;
+        transform: translate(-50%, -50%);
+        font: 800 34px/1 var(--sans);
+        text-transform: uppercase;
+        letter-spacing: -0.02em;
+        color: var(--x-gold);
+        text-shadow: 0 0 20px #ffc53d88;
+        animation: popout 0.9s var(--ease-out, ease-out) forwards;
+      }
+      @keyframes popout { 0% { opacity: 0; transform: translate(-50%, -30%) scale(0.5) rotate(-6deg); } 25% { opacity: 1; transform: translate(-50%, -50%) scale(1.15) rotate(3deg); } 100% { opacity: 0; transform: translate(-50%, -120%) scale(1); } }
+      .x-conf { position: absolute; width: 9px; height: 14px; border-radius: 2px; animation: fall 1.4s linear forwards; }
+      @keyframes fall { to { transform: translateY(105vh) rotate(720deg); opacity: 0.2; } }
+      .x-emote { position: absolute; font-size: 34px; animation: floatup 1.3s ease-out forwards; }
+      @keyframes floatup { 0% { opacity: 0; transform: translateY(0) scale(0.6); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateY(-160px) scale(1.2); } }
+
+      /* heat */
+      .x-heat { display: flex; align-items: center; gap: 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--x-dim); }
+      .x-heat i { flex: 1; height: 5px; border-radius: 99px; background: #ffffff14; }
+      .x-heat i.on { background: linear-gradient(90deg, var(--x-gold), var(--x-pink)); box-shadow: 0 0 10px #ff2d9566; }
+      .x-heat.is-lit { color: var(--x-gold); animation: pulse 1s infinite; }
+      @keyframes pulse { 50% { opacity: 0.6; } }
+
+      /* leaderboard */
+      .x-board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; width: 100%; }
+      .x-bot {
+        min-width: 0;
+        border: 1px solid var(--x-line);
+        border-radius: 10px;
+        padding: 4px 5px;
+        background: #ffffff08;
+        font-size: 12px;
+        line-height: 1.25;
+        color: #fff;
+      }
+      .x-bot b, .x-bot span { display: block; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .x-bot.is-you { border-color: var(--x-green); background: #9dff3c1f; box-shadow: 0 0 0 1px var(--x-green) inset, 0 0 12px #9dff3c33; }
+      .x-bot.is-you b { color: var(--x-green); }
+      .x-bot.is-out { opacity: 0.4; }
+      .x-bot u { text-decoration: none; color: var(--x-cyan); font-variant-numeric: tabular-nums; }
+      .x-emotes { display: flex; gap: 4px; justify-content: flex-end; align-items: center; min-width: 0; }
+      .x-emotes button { flex: 0 0 auto; }
+      .x-emotes span { flex: 1 1 0; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--x-dim); }
+      .x-emotes button:active { transform: scale(0.9); }
+      .x-emotes button {
+        width: 44px; height: 44px; border-radius: 50%;
+        border: 1px solid var(--x-line); background: #1b0f2ecc; color: var(--x-ink);
+        font-size: 18px; font-weight: 700; cursor: pointer;
+      }
+
+      /* shop */
+      .x-shelf { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .x-offer {
+        border: 1px solid var(--x-line);
+        border-radius: 14px;
+        background: linear-gradient(180deg, var(--x-panel2), var(--x-panel));
+        padding: 10px 8px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-size: 12px;
+        line-height: 1.25;
+        color: #fff;
+      }
+      .x-offer i { font-size: 26px; font-style: normal; }
+      .x-offer b { font-size: 13px; }
+      .x-offer .x-btn { min-height: 36px; padding: 0 8px; font-size: 12px; }
+      .x-offer.is-sold { opacity: 0.35; }
+      .x-offer.r-rare { border-color: #4da3ff; }
+      .x-offer.r-epic { border-color: #b061ff; }
+      .x-offer.r-legendary { border-color: var(--x-gold); }
+      .x-box { text-align: center; }
+      .x-box.is-shaking { animation: shake 0.5s 2; }
+      .x-note { font-size: 12px; color: var(--x-dim); min-height: 16px; }
+
+      /* wheel */
+      .x-wheelwrap { position: relative; width: min(80vw, 320px, 46vh); aspect-ratio: 1; margin: 0 auto; }
+      .x-wheel { width: 100%; height: 100%; border-radius: 50%; border: 4px solid #ffffff22; box-shadow: 0 0 40px #ff2d9544; transition: transform 4.6s cubic-bezier(0.12, 0.72, 0.1, 1); }
+      .x-needle { position: absolute; top: -6px; left: 50%; transform: translateX(-50%); font-size: 26px; }
+      .x-slices { position: absolute; inset: 0; }
+      .x-slices span {
+        position: absolute; left: 50%; top: 50%; width: 50%; height: 22px; margin-top: -11px; box-sizing: border-box;
+        padding-right: 7%; text-align: right; transform-origin: 0 50%;
+        font: 800 15px/22px var(--sans); text-transform: uppercase; color: #fff; white-space: nowrap;
+        text-shadow: 0 1px 2px #000, 0 0 6px #000c;
+      }
+      .x-slices span.x-flip { left: 0; transform-origin: 100% 50%; text-align: left; padding-right: 0; padding-left: 7%; }
+      .x-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
+      .x-mute { position: fixed; top: calc(10px + env(safe-area-inset-top)); right: 12px; z-index: 50; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--x-line); background: #1b0f2ecc; color: var(--x-ink); font-size: 17px; cursor: pointer; }
+      .x-mute.is-docked { position: static; flex: 0 0 auto; margin-left: 4px; }
+      #s-game > .x-board[hidden] ~ .x-hud, #s-shop > .x-kicker:first-child { margin-right: 52px; }
+      html, body { overflow: hidden; max-width: 100vw; }
+      .x-app { height: 100vh; height: 100dvh; bottom: auto; overflow: hidden; max-width: 100vw; }
+      .x-screen { overflow-x: hidden; max-width: 100vw; }
+      #s-game { gap: 8px; }
+      #s-game > * { min-width: 0; max-width: 100%; }
+      #s-game .x-charms { flex: 0 0 auto; }
+
+      /* logo + menu */
+      .x-logo {
+        font: 900 clamp(56px, 21vw, 112px)/0.9 var(--sans);
+        letter-spacing: -0.05em;
+        color: #fff;
+        -webkit-text-stroke: 2px #fff;
+        text-shadow: 4px 4px 0 var(--x-pink), -3px -3px 0 var(--x-cyan), 0 0 18px #ff2d95cc, 0 0 42px #2de2ff88;
+        animation: xbob 2.4s ease-in-out infinite;
+        transform-origin: 50% 100%;
+      }
+      @keyframes xbob { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-8px) rotate(1deg) scale(1.03); } }
+      .x-tagline { font: 700 16px/1.3 var(--sans); color: var(--x-cyan); text-shadow: 0 0 12px #2de2ff77; letter-spacing: 0.02em; }
+      .x-help { width: 48px; height: 48px; min-height: 48px; padding: 0; border-radius: 50%; font-size: 20px; align-self: center; }
+
+      /* onboarding */
+      .x-ob { position: fixed; inset: 0; z-index: 60; background: #0b0616ee; display: flex; flex-direction: column; gap: 12px; padding: calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom)); overflow-y: auto; animation: xin 0.2s ease-out; }
+      .x-ob__top { display: flex; justify-content: space-between; align-items: center; }
+      .x-ob__track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; flex: 0 0 auto; gap: 12px; }
+      .x-ob__track::-webkit-scrollbar { display: none; }
+      .x-ob__card { flex: 0 0 100%; scroll-snap-align: center; border: 1px solid var(--x-line); border-radius: 20px; background: linear-gradient(180deg, var(--x-panel2), var(--x-panel)); padding: 22px 18px; display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center; box-sizing: border-box; }
+      .x-ob__card p { font: 700 20px/1.25 var(--sans); }
+      .x-ob__card b { color: var(--x-pink); }
+      .x-ob__art { height: 110px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+      .x-ob__dots { display: flex; gap: 6px; justify-content: center; }
+      .x-ob__dots i { width: 8px; height: 8px; border-radius: 50%; background: #ffffff33; transition: background 0.2s, width 0.2s; }
+      .x-ob__dots i.on { background: var(--x-pink); width: 22px; border-radius: 99px; }
+      .x-mini { width: 56px; height: 56px; border-radius: 22%; background-color: #f4eefa; background-image: linear-gradient(180deg, #fffdfb, #ddd3ea); display: grid; place-items: center; color: #180a26; font: 800 26px/1 var(--sans); }
+      .x-mini.wig { animation: wig 0.9s ease-in-out infinite; }
+      .x-mini.held { transform: translateY(-10px); box-shadow: 0 0 0 2px var(--x-green), 0 8px 22px #9dff3c66; animation: xheld 1.6s ease-in-out infinite; }
+      @keyframes xheld { 50% { transform: translateY(-14px); } }
+      .x-mini.tum { animation: xtum 1.2s ease-in-out infinite; }
+      .x-mini.tum:nth-child(2) { animation-delay: 0.2s; }
+      @keyframes xtum { 0%,60%,100% { transform: none; } 20% { transform: translateY(-18px) rotate(-120deg); } 40% { transform: translateY(0) rotate(-360deg); } }
+      .x-ob__play { font: 800 14px/1 var(--sans); padding: 10px 14px; border-radius: 12px; background: #c2006d; color: #fff; animation: pulse 1.2s infinite; }
+      .x-count { font: 800 30px/1 var(--sans); font-variant-numeric: tabular-nums; display: flex; align-items: center; gap: 8px; }
+      .x-count .c { color: var(--x-cyan); }
+      .x-count .m { color: var(--x-pink); }
+      .x-roll { height: 34px; overflow: hidden; color: var(--x-green); text-shadow: 0 0 14px #9dff3c88; }
+      .x-roll i { font-style: normal; display: block; height: 34px; }
+      .x-roll span { display: flex; flex-direction: column; line-height: 34px; animation: xcount 2.4s steps(1) infinite; }
+      @keyframes xcount { 0% { transform: translateY(0); } 15% { transform: translateY(-34px); } 30% { transform: translateY(-68px); } 45% { transform: translateY(-102px); } 60%,100% { transform: translateY(-136px); } }
+      .x-stack { display: flex; }
+      .x-stack i { font-style: normal; font-size: 30px; width: 54px; height: 54px; display: grid; place-items: center; border-radius: 14px; border: 1px solid var(--x-gold); background: var(--x-panel); margin-left: -10px; box-shadow: 0 0 14px #ffc53d55; animation: xstack 2.4s ease-out infinite both; }
+      .x-stack i:nth-child(2) { animation-delay: 0.3s; }
+      .x-stack i:nth-child(3) { animation-delay: 0.6s; }
+      @keyframes xstack { 0% { opacity: 0; transform: translateY(-30px) scale(0.6); } 20%,85% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+      .x-cheat { border: 1px solid var(--x-line); border-radius: 16px; padding: 10px 12px; background: #ffffff08; }
+      .x-cheat h3 { font: var(--type-tag); letter-spacing: 0.18em; text-transform: uppercase; color: var(--x-cyan); margin-bottom: 6px; }
+      .x-cheat div { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; padding: 4px 0; border-top: 1px solid var(--x-line); }
+      .x-cheat div:first-of-type { border-top: 0; }
+      .x-cheat u { text-decoration: none; font-variant-numeric: tabular-nums; color: var(--x-dim); white-space: nowrap; }
+      .x-cheat u .c { color: var(--x-cyan); } .x-cheat u .m { color: var(--x-pink); }
+
+      /* vibe check banner */
+      .x-vibe { position: absolute; inset: 0; display: grid; place-items: center; background: #0b0616aa; animation: xvfade 1.6s ease-out forwards; }
+      .x-vibe::before { content: ""; position: absolute; left: 50%; top: 50%; width: 160vmax; height: 160vmax; margin: -80vmax 0 0 -80vmax; background: repeating-conic-gradient(#ff2d9555 0 10deg, transparent 10deg 20deg, #2de2ff44 20deg 30deg, transparent 30deg 40deg); border-radius: 50%; -webkit-mask: radial-gradient(circle, #000 0, #000 20%, transparent 60%); mask: radial-gradient(circle, #000 0, #000 20%, transparent 60%); animation: xburst 1.6s ease-out forwards; }
+      .x-vibe b { position: relative; font: 900 clamp(40px, 14vw, 84px)/0.9 var(--sans); letter-spacing: -0.04em; text-align: center; color: #fff; text-shadow: 4px 4px 0 var(--x-pink), -3px -3px 0 var(--x-cyan), 0 0 30px #9dff3caa; animation: xvpop 1.6s cubic-bezier(0.2, 1.4, 0.4, 1) forwards; }
+      @keyframes xburst { 0% { transform: scale(0) rotate(0); opacity: 1; } 100% { transform: scale(1) rotate(60deg); opacity: 0.7; } }
+      @keyframes xvpop { 0% { transform: scale(0.2) rotate(-10deg); opacity: 0; } 25% { transform: scale(1.12) rotate(-3deg); opacity: 1; } 40%,85% { transform: scale(1) rotate(-3deg); opacity: 1; } 100% { transform: scale(1.1) rotate(-3deg); opacity: 0; } }
+      @keyframes xvfade { 85% { opacity: 1; } 100% { opacity: 0; } }
+      /* ambient background */
+      .x-bg { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+      .x-bg__grad { position: absolute; inset: 0; will-change: transform, opacity; animation: xbgdrift 28s ease-in-out infinite alternate;
+        background: radial-gradient(44% 36% at 22% 30%, #ff2d9530, transparent 70%), radial-gradient(44% 40% at 78% 62%, #2de2ff24, transparent 70%), radial-gradient(52% 40% at 50% 92%, #b061ff2c, transparent 70%); }
+      @keyframes xbgdrift { 0% { transform: translate3d(-4%, -3%, 0); opacity: 0.8; } 50% { opacity: 1; } 100% { transform: translate3d(4%, 3%, 0); opacity: 0.85; } }
+      .x-mote { position: absolute; bottom: -12px; border-radius: 50%; background: #fff; opacity: 0; will-change: transform, opacity; animation: xmote linear infinite; }
+      @keyframes xmote { 0% { transform: translate3d(0, 0, 0); opacity: 0; } 12%, 85% { opacity: var(--o, 0.2); } 100% { transform: translate3d(var(--dx, 0px), -108vh, 0); opacity: 0; } }
+      @media (prefers-reduced-motion: reduce) { .x-bg__grad, .x-mote, .x-die.is-held, .x-die::before, .x-charm, .x-offer, .x-charm::before, .x-offer::before, .x-charm::after, .x-offer::after { animation: none !important; } }
+      @media (prefers-reduced-motion: reduce) { .x-logo, .x-mini, .x-roll span, .x-stack i, .x-ob__play { animation: none !important; } }
+      /* pass 2: preview, tooltip, recap, focus */
+      .x-btn:focus-visible, .x-charm:focus-visible, .x-die:focus-visible, .x-mute:focus-visible { outline: 3px solid var(--x-cyan); outline-offset: 3px; }
+      .x-btn--gold { background: var(--x-gold); border-color: #ffe3a1; color: #2a1800; box-shadow: 0 0 24px #ffc53d44; }
+      .x-proj { text-align: center; font: 700 14px/1.2 var(--sans); font-variant-numeric: tabular-nums; color: var(--x-dim); margin: -2px 0 2px; min-height: 17px; transition: color 0.15s; }
+      .x-proj.is-win { color: var(--x-green); text-shadow: 0 0 10px #9dff3c88; }
+      .x-tip { position: fixed; z-index: 75; max-width: 240px; padding: 10px 12px; border-radius: 14px; border: 1px solid var(--x-line); background: var(--x-panel); box-shadow: 0 8px 28px #000a; font-size: 13px; line-height: 1.35; animation: xin 0.16s ease-out; pointer-events: none; }
+      .x-tip b { display: block; font-size: 14px; } .x-tip small { display: block; font-size: 12px; color: var(--x-dim); text-transform: uppercase; letter-spacing: 0.08em; margin: 2px 0 4px; }
+      .x-ocharms { font-size: 24px; letter-spacing: 4px; min-height: 28px; }
+      .x-share { font-size: 12px; color: var(--x-dim); user-select: all; -webkit-user-select: all; }
+      .x-on:not([hidden]) .x-on__card { animation: xin 0.18s ease-out; }
+      #s-menu .x-center { gap: 12px; }
+      @media (max-height: 700px) { #s-menu .x-center { gap: 9px; } #s-menu .x-btn--big { min-height: 52px; font-size: 18px; } #s-menu .x-logo { font-size: clamp(52px, 18vw, 96px); } }
+    </style>
+    <script defer src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  </head>
+  <body>
+    <div class="page" id="top">
+      <div class="x-bg" id="bg" aria-hidden="true"><div class="x-bg__grad"></div></div>
+      <main class="x-app">
+        <button class="x-mute" id="mute" aria-label="Toggle sound">🔊</button>
+
+        <section class="x-screen is-on" id="s-menu">
+          <div class="x-center">
+            <p class="x-kicker">yahtzee × balatro</p>
+            <h1 class="x-logo">LOADED!</h1>
+            <p class="x-tagline">roll dice. stack charms. get loaded.</p>
+            <p class="x-dim">8 rounds, bosses every third, charms that break the game.</p>
+            <button class="x-btn x-btn--big x-btn--pink" id="go-solo">Play solo</button>
+            <button class="x-btn x-btn--big x-btn--gold" id="go-daily">DAILY RUN 📅</button>
+            <button class="x-btn x-btn--big x-btn--green" id="go-online">PLAY ONLINE 🌐</button>
+            <button class="x-btn x-btn--big x-btn--cyan" id="go-party">Play vs bots</button>
+            <button class="x-btn x-btn--ghost x-help" id="help" aria-label="How to play">?</button>
+          </div>
+        </section>
+
+        <section class="x-screen" id="s-wheel">
+          <div class="x-center" style="align-items: stretch; text-align: center">
+            <p class="x-kicker">pre-run blessing</p>
+            <h2 class="x-title" style="font-size: clamp(28px, 10vw, 46px)">Spin it</h2>
+            <div class="x-wheelwrap">
+              <div class="x-needle">🔻</div>
+              <div class="x-wheel" id="wheel"><div class="x-slices" id="slices"></div></div>
+            </div>
+            <p class="x-note" id="wheel-note">One free buff. No take-backs.</p>
+            <button class="x-btn x-btn--big x-btn--green" id="spin">Spin</button>
+            <button class="x-btn x-btn--ghost" id="wheel-go" disabled>Start the run</button>
+          </div>
+        </section>
+
+        <section class="x-screen" id="s-game">
+          <div class="x-board" id="board" hidden></div>
+          <div class="x-emotes" id="emotes" hidden>
+            <span>Lobby · 4</span>
+            <button data-e="💀" aria-label="Skull emote">💀</button>
+            <button data-e="🔥" aria-label="Fire emote">🔥</button>
+            <button data-e="😭" aria-label="Crying emote">😭</button>
+            <button data-e="W" aria-label="W emote" style="color: var(--x-green)">W</button>
+            <button data-e="L" aria-label="L emote" style="color: var(--x-pink)">L</button>
+          </div>
+          <div class="x-hud">
+            <div class="x-cell"><b id="h-round">1/8</b><span>Round</span></div>
+            <div class="x-cell"><b id="h-hands">4</b><span>Hands</span></div>
+            <div class="x-cell"><b id="h-rerolls">3</b><span>Rerolls</span></div>
+            <div class="x-cell"><b id="h-coins">$0</b><span>Bag</span></div>
+          </div>
+          <div class="x-goal" id="goal">
+            <div class="x-goal__top">
+              <span class="x-goal__score" id="g-score">0</span>
+              <span class="x-dim">target <b id="g-target">300</b></span>
+            </div>
+            <div class="x-bar"><i id="g-bar"></i></div>
+            <p class="x-curse" id="g-curse" hidden></p>
+          </div>
+          <div class="x-heat" id="heat"><span>Heat</span><i></i><i></i><i></i></div>
+          <div class="x-charms" id="charms"></div>
+          <div class="x-stage">
+            <div class="x-table">
+              <p class="x-calc" id="calc"></p>
+              <p class="x-handlabel" id="hand">Roll 'em<small>tap dice to hold</small></p>
+              <p class="x-proj" id="proj" aria-live="polite"></p>
+              <div class="x-dice" id="dice"></div>
+            </div>
+            <div class="x-row x-row--fill">
+              <button class="x-btn x-btn--cyan" id="btn-reroll">Reroll · 3</button>
+              <button class="x-btn x-btn--pink" id="btn-play">Play hand</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="x-screen" id="s-shop">
+          <p class="x-kicker">drip shop</p>
+          <h2 class="x-title" style="font-size: clamp(28px, 10vw, 44px)">Cop something</h2>
+          <p class="x-dim" id="shop-bag">Bag: $0 · Charms 0/5</p>
+          <p class="x-curse" id="shop-boss" style="margin-top: 0"></p>
+          <div class="x-shelf" id="shelf"></div>
+          <div class="x-row x-row--fill">
+            <button class="x-btn" id="shop-reroll">Reroll · $2</button>
+            <button class="x-btn x-btn--ghost x-box" id="mystery">Mystery box · $5</button>
+          </div>
+          <p class="x-note" id="shop-note"></p>
+          <p class="x-kicker">your charms (tap to sell)</p>
+          <div class="x-charms" id="shop-charms"></div>
+          <button class="x-btn x-btn--big x-btn--green" id="shop-next" style="margin-top: auto">Next round</button>
+        </section>
+
+        <section class="x-screen" id="s-over">
+          <div class="x-center" style="align-items: stretch; text-align: center">
+            <h2 class="x-title" id="over-title">it's so over</h2>
+            <p class="x-dim" id="over-sub"></p>
+            <div class="x-stats" id="over-stats"></div>
+            <p class="x-ocharms" id="over-charms" aria-label="Charms owned"></p>
+            <p class="x-share" id="share-txt"></p>
+            <button class="x-btn x-btn--big x-btn--green" id="share">Share result</button>
+            <button class="x-btn x-btn--big x-btn--pink" id="again">Run it back</button>
+            <button class="x-btn x-btn--ghost" id="endless" hidden>Enter endless mode</button>
+          </div>
+        </section>
+
+        <div class="x-ob" id="ob" role="dialog" aria-modal="true" aria-label="How to play" hidden>
+          <div class="x-ob__top">
+            <p class="x-kicker">how to get loaded</p>
+            <button class="x-btn x-btn--ghost" id="ob-skip">Skip</button>
+          </div>
+          <div class="x-ob__track" id="ob-track">
+            <div class="x-ob__card">
+              <div class="x-ob__art"><span class="x-mini wig">3</span><span class="x-mini held">6</span><span class="x-mini wig">1</span></div>
+              <p>Roll 5 dice. Tap any to <b>HOLD</b>.</p>
+            </div>
+            <div class="x-ob__card">
+              <div class="x-ob__art"><span class="x-mini tum">2</span><span class="x-mini tum">5</span><span class="x-ob__play">PLAY</span></div>
+              <p>Reroll the rest, then <b>PLAY</b> your best hand.</p>
+            </div>
+            <div class="x-ob__card">
+              <div class="x-ob__art"><span class="x-count"><span class="c">40</span><small class="x-dim">×</small><span class="m">4</span><small class="x-dim">=</small><span class="x-roll"><span><i>0</i><i>40</i><i>80</i><i>120</i><i>160</i></span></span></span></div>
+              <p>Score = <b>CHIPS × MULT</b>. Beat the Vibe Check to cash out.</p>
+            </div>
+            <div class="x-ob__card">
+              <div class="x-ob__art"><span class="x-stack"><i>🍀</i><i>🔥</i><i>💎</i></span></div>
+              <p>Spend coins on Charms. Stack combos. Get <b>LOADED</b>.</p>
+            </div>
+          </div>
+          <div class="x-ob__dots" id="ob-dots"><i class="on"></i><i></i><i></i><i></i></div>
+          <button class="x-btn x-btn--big x-btn--pink" id="ob-next">Next</button>
+          <div class="x-cheat" id="ob-cheat" hidden><h3>Hand values · chips × mult</h3></div>
+        </div>
+        <div class="x-fx" id="fx"></div>
+      </main>
+    </div>
+    <script src="hark.js"></script>
+    <script>
+      document.documentElement.setAttribute("data-theme", "dark");
+      /* ---------- prng ---------- */
+      function mulberry32(a) {
+        return function () {
+          a |= 0; a = (a + 0x6d2b79f5) | 0;
+          var t = Math.imul(a ^ (a >>> 15), 1 | a);
+          t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+      var rng = mulberry32(Date.now() >>> 0);
+      function rnd(n) { return Math.floor(rng() * n); }
+      function pick(arr) { return arr[rnd(arr.length)]; }
+      function $(id) { return document.getElementById(id); }
+      function fmt(n) { return n.toLocaleString("en-US"); }
+
+      /* ---------- audio ---------- */
+      var AC = null, muted = false;
+      function audio() {
+        if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { AC = null; } }
+        if (AC && AC.state === "suspended") AC.resume();
+        return AC;
+      }
+      function tone(freq, dur, type, vol, slide) {
+        var ac = audio();
+        if (!ac || muted) return;
+        var o = ac.createOscillator(), g = ac.createGain();
+        o.type = type || "square";
+        o.frequency.setValueAtTime(freq, ac.currentTime);
+        if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(40, slide), ac.currentTime + dur);
+        g.gain.setValueAtTime(0.0001, ac.currentTime);
+        g.gain.exponentialRampToValueAtTime(vol || 0.12, ac.currentTime + 0.012);
+        g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + dur);
+        o.connect(g); g.connect(ac.destination);
+        o.start(); o.stop(ac.currentTime + dur + 0.02);
+      }
+      var SFX = {
+        // Math.random, not rng(): sound timing must never shift the seeded dice (daily / online)
+        roll: function () { for (var i = 0; i < 5; i++) setTimeout(function () { tone(180 + Math.random() * 260, 0.07, "triangle", 0.08, 90); }, i * 45); },
+        tick: function () { tone(820 + Math.random() * 300, 0.04, "square", 0.05); },
+        click: function () { tone(420, 0.05, "square", 0.07, 300); },
+        ching: function () { tone(1180, 0.1, "triangle", 0.11); setTimeout(function () { tone(1570, 0.22, "triangle", 0.1); }, 80); },
+        slay: function () { [523, 659, 784, 1047, 1319].forEach(function (f, i) { setTimeout(function () { tone(f, 0.26, "sawtooth", 0.09); }, i * 70); }); },
+        bad: function () { tone(220, 0.5, "sawtooth", 0.1, 60); }
+      };
+      try { muted = localStorage.getItem("ll-muted") === "1"; } catch (e) {}
+      $("mute").textContent = muted ? "🔇" : "🔊";
+      $("mute").setAttribute("aria-pressed", muted ? "true" : "false");
+      $("mute").onclick = function () {
+        muted = !muted;
+        this.textContent = muted ? "🔇" : "🔊";
+        this.setAttribute("aria-pressed", muted ? "true" : "false");
+        try { localStorage.setItem("ll-muted", muted ? "1" : "0"); } catch (e) {}
+        if (!muted) { audio(); SFX.click(); }
+      };
+      ["pointerdown", "touchend", "keydown"].forEach(function (ev) {
+        document.addEventListener(ev, function unlock() {
+          var ac = audio();
+          if (ac && ac.state === "running") ["pointerdown", "touchend", "keydown"].forEach(function (e2) { document.removeEventListener(e2, unlock); });
+        });
+      });
+    </script>
+    <script>
+      /* ---------- data ---------- */
+      // pass 2 curve (was 300, 800, 2000, 5000, 11000, 25000, 50000, 100000): R1-2 onboarding, R3 first wall, ~1.4-2.4x steps after
+      var TARGETS = [250, 600, 1500, 3500, 5500, 8500, 12000, 16000];
+      var HANDS = {
+        five: { name: "Five of a kind", chips: 100, mult: 12, tag: "SLAY", rank: 8 },
+        quads: { name: "Quads", chips: 60, mult: 7, tag: "no cap", rank: 7 },
+        large: { name: "Large Straight", chips: 50, mult: 5, tag: "highkey straight", rank: 6 },
+        full: { name: "Full House", chips: 40, mult: 4, tag: "full house era", rank: 5 },
+        small: { name: "Small Straight", chips: 35, mult: 3, tag: "lowkey straight", rank: 4 },
+        trips: { name: "Trips", chips: 30, mult: 3, tag: "it's giving", rank: 3 },
+        two: { name: "Two Pair", chips: 20, mult: 2, tag: "double date", rank: 2 },
+        pair: { name: "Pair", chips: 10, mult: 2, tag: "a lil something", rank: 1 },
+        chance: { name: "Chance", chips: 5, mult: 1, tag: "it is what it is", rank: 0 }
+      };
+      var CURSES = [
+        { id: "sixes", text: "☠ Curse: sixes score 0" },
+        { id: "onereroll", text: "☠ Curse: only 1 reroll" },
+        { id: "nohold", text: "☠ Curse: no holding" }
+      ];
+      var RARITY = {
+        common: { price: 4, w: 50, label: "Common" },
+        rare: { price: 6, w: 30, label: "Rare" },
+        epic: { price: 9, w: 15, label: "Epic" },
+        legendary: { price: 14, w: 5, label: "Legendary" }
+      };
+      var CHARMS = [
+        { id: "main", name: "Main Character", icon: "🌟", r: "common", d: "+4 mult" },
+        { id: "rizz", name: "Rizzler", icon: "😏", r: "common", d: "+1 mult per held die" },
+        { id: "grass", name: "Touch Grass", icon: "🌱", r: "common", d: "+30 chips if rerolls left" },
+        { id: "fanum", name: "Fanum Tax", icon: "🍗", r: "common", d: "+$1 per hand" },
+        { id: "delulu", name: "Delulu", icon: "🦄", r: "rare", d: "x2 mult on Pairs" },
+        { id: "roman", name: "Roman Empire", icon: "🏛️", r: "rare", d: "Straights +50 chips" },
+        { id: "rent", name: "Rent Free", icon: "🧠", r: "rare", d: "+1 hand per round" },
+        { id: "unc", name: "Unc Status", icon: "👴", r: "rare", d: "+10 mult on last hand" },
+        { id: "gyatt", name: "Gyatt", icon: "🍑", r: "epic", d: "Full House x3 mult" },
+        { id: "brainrot", name: "Brainrot", icon: "🌀", r: "epic", d: "Random x1 to x4 mult" },
+        { id: "sigma", name: "Sigma Grindset", icon: "🗿", r: "epic", d: "+1 mult per round cleared" },
+        { id: "slayq", name: "Slay Queen", icon: "👑", r: "legendary", d: "Five of a kind x3" }
+      ];
+      var WHEEL = [
+        { id: "c3", label: "+$3", color: "#6a1fe0", w: 26 },
+        { id: "c5", label: "+$5", color: "#c4006a", w: 20 },
+        { id: "hand", label: "+1 hand", color: "#00718c", w: 18 },
+        { id: "reroll", label: "+1 reroll", color: "#2f7a08", w: 20 },
+        { id: "rare", label: "Rare 🎁", color: "#2448c9", w: 12 },
+        { id: "jack", label: "JACKPOT", color: "#9a5a00", w: 4 }
+      ];
+      var BOTS = ["xX_RollGod_Xx", "brenda (real)", "the unc"];
+      var POPS = ["BUSSIN", "SHEESH", "ATE", "NO NOTES", "VALID", "BET", "W"];
+      var BOT_EMOTES = ["💀", "🔥", "😭", "W", "L"];
+
+      /* ---------- state (plain data, so a later pass can sync it) ---------- */
+      var S = null;
+      function targetFor(round) {
+        if (round <= 8) return TARGETS[round - 1];
+        return Math.round(TARGETS[7] * Math.pow(2.2, round - 8));
+      }
+      function today() { var d = new Date(); return { n: d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate(), md: d.getMonth() + 1 + "/" + d.getDate() }; }
+      function curseFor(r) { if (!S.curses[r]) S.curses[r] = pick(CURSES); return S.curses[r]; }
+      function newRun(mode) {
+        var day = today(), seed = mode === "daily" ? day.n : (Date.now() ^ (Math.random() * 1e9)) >>> 0;
+        rng = mulberry32(seed);
+        S = {
+          seed: seed,
+          mode: mode,
+          day: mode === "daily" ? day.md : "",
+          curses: {},
+          round: 1,
+          endless: false,
+          coins: 4,
+          charms: [],
+          bonusHands: 0,
+          bonusRerolls: 0,
+          score: 0,
+          hands: 4,
+          rerolls: 3,
+          curse: null,
+          dice: [],
+          heat: 0,
+          onFire: false,
+          shop: [],
+          stats: { hands: 0, total: 0, best: 0, bestHand: "", slays: 0, earned: 0, cleared: 0 },
+          players: [{ id: "you", name: "you", isBot: false, round: 1, score: 0, out: false }]
+        };
+        if (mode === "party") {
+          BOTS.forEach(function (n, i) {
+            S.players.push({ id: "bot" + i, name: n, isBot: true, round: 1, score: 0, out: false, bust: 2 + rnd(9), pace: 0.6 + rng() * 0.8 });
+          });
+        }
+      }
+      function has(id) { return S.charms.filter(function (c) { return c.id === id; }); }
+      function charmDef(id) { return CHARMS.filter(function (c) { return c.id === id; })[0]; }
+
+      /* ---------- screens ---------- */
+      function show(id) {
+        ["s-menu", "s-wheel", "s-game", "s-shop", "s-over"].forEach(function (s) { $(s).classList.toggle("is-on", s === id); });
+        $("emotes").hidden = !(S && S.mode === "party");
+        var m = $("mute"), dock = id === "s-game" && S && S.mode === "party";
+        if (dock && m.parentNode !== $("emotes")) $("emotes").appendChild(m);
+        if (!dock && m.parentNode === $("emotes")) $("s-menu").parentNode.insertBefore(m, $("s-menu"));
+        m.classList.toggle("is-docked", !!dock);
+        $(id).scrollTop = 0;
+        hideTip();
+        syncBots();
+      }
+
+      /* ---------- hand detection ---------- */
+      function detect(vals) {
+        var cnt = [0, 0, 0, 0, 0, 0, 0];
+        vals.forEach(function (v) { cnt[v]++; });
+        var has = function (a) { return a.every(function (v) { return cnt[v] > 0; }); };
+        var groups = [];
+        for (var f = 6; f >= 1; f--) if (cnt[f] >= 2) groups.push(f);
+        var max = Math.max.apply(null, cnt);
+        var idx = function (pred) { var out = []; vals.forEach(function (v, i) { if (pred(v)) out.push(i); }); return out; };
+        var oneEach = function (faces) { var used = {}, out = []; vals.forEach(function (v, i) { if (faces.indexOf(v) >= 0 && !used[v]) { used[v] = 1; out.push(i); } }); return out; };
+        if (max === 5) return { key: "five", idx: [0, 1, 2, 3, 4] };
+        if (max === 4) { var q = cnt.indexOf(4); return { key: "quads", idx: idx(function (v) { return v === q; }) }; }
+        if (has([1, 2, 3, 4, 5]) || has([2, 3, 4, 5, 6])) return { key: "large", idx: [0, 1, 2, 3, 4] };
+        if (max === 3 && groups.length === 2) return { key: "full", idx: [0, 1, 2, 3, 4] };
+        var runs = [[3, 4, 5, 6], [2, 3, 4, 5], [1, 2, 3, 4]];
+        for (var r = 0; r < runs.length; r++) if (has(runs[r])) return { key: "small", idx: oneEach(runs[r]) };
+        if (max === 3) { var t = cnt.indexOf(3); return { key: "trips", idx: idx(function (v) { return v === t; }) }; }
+        if (groups.length >= 2) return { key: "two", idx: idx(function (v) { return v === groups[0] || v === groups[1]; }) };
+        if (groups.length === 1) return { key: "pair", idx: idx(function (v) { return v === groups[0]; }) };
+        return { key: "chance", idx: [0, 1, 2, 3, 4] };
+      }
+
+      /* ---------- rendering ---------- */
+      var PIPS = { 1: [4], 2: [0, 8], 3: [0, 4, 8], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8] };
+      function dieHTML(d) {
+        var h = '<span class="x-face" aria-hidden="true">';
+        for (var i = 0; i < 9; i++) h += PIPS[d.v].indexOf(i) >= 0 ? "<s></s>" : "<span></span>";
+        return h + "</span>" + (d.gold ? "<em>✨</em>" : "");
+      }
+      var dieBtns = null;
+      function ensureDice() {
+        if (dieBtns) return dieBtns;
+        var box = $("dice");
+        box.innerHTML = "";
+        dieBtns = [];
+        for (var i = 0; i < 5; i++) (function (i) {
+          var b = document.createElement("button");
+          b.className = "x-die";
+          b._v = 0; b._g = null;
+          b.addEventListener("click", function () { toggleHold(i); });
+          b.addEventListener("animationend", function (ev) { if (ev.animationName === "tumble") { b.classList.remove("is-roll"); b.style.animationDelay = ""; b.style.animationDuration = ""; } });
+          box.appendChild(b);
+          dieBtns.push(b);
+        })(i);
+        return dieBtns;
+      }
+      function renderDice(rolled) {
+        var btns = ensureDice(), dead = S.curse && S.curse.id === "sixes";
+        rolled = rolled || [];
+        // writes only: strip the roll class first, one reflow, then re-add
+        rolled.forEach(function (i) { btns[i].classList.remove("is-roll", "x-hit"); });
+        if (rolled.length) void btns[0].offsetWidth;
+        S.dice.forEach(function (d, i) {
+          var b = btns[i], r = rolled.indexOf(i);
+          b.classList.toggle("is-held", !!d.held);
+          b.classList.toggle("is-gold", !!d.gold);
+          b.classList.toggle("is-dead", !!(dead && d.v === 6));
+          b.setAttribute("aria-label", "Die showing " + d.v + (d.held ? ", held" : "") + (d.gold ? ", golden" : ""));
+          if (b._v !== d.v || b._g !== !!d.gold) { b.innerHTML = dieHTML(d); b._v = d.v; b._g = !!d.gold; }
+          if (r >= 0) {
+            b.style.animationDelay = r * 75 + "ms";
+            b.style.animationDuration = 0.62 + Math.random() * 0.2 + "s";
+            b.classList.add("is-roll");
+          }
+        });
+        var h = detect(S.dice.map(function (d) { return d.v; }));
+        var H = HANDS[h.key];
+        $("hand").innerHTML = H.name + "<small>" + H.chips + " chips × " + H.mult + " mult · " + H.tag + "</small>";
+      }
+      function charmTile(c, i, sell) {
+        var def = charmDef(c.id);
+        var extra = c.id === "sigma" ? " (+" + (c.stack || 0) + ")" : "";
+        return '<div class="x-charm r-' + def.r + '" data-i="' + i + '" role="button" tabindex="0"><i>' + def.icon + "</i><b>" + def.name + "</b>" + def.d + extra + (sell ? "<br><u style='text-decoration:none;color:var(--x-green)'>sell $" + Math.floor(RARITY[def.r].price / 2) + "</u>" : "") + "</div>";
+      }
+      function renderCharms() {
+        $("charms").innerHTML = S.charms.length ? S.charms.map(function (c, i) { return charmTile(c, i, false); }).join("") : '<p class="x-empty">No charms yet. Clear a round to shop.</p>';
+      }
+      var tipEl = null, tipT = 0;
+      function hideTip() { clearTimeout(tipT); if (tipEl) { tipEl.remove(); tipEl = null; } }
+      function showTip(el) {
+        var c = S.charms[+el.dataset.i]; if (!c) return;
+        var def = charmDef(c.id), r = el.getBoundingClientRect();
+        hideTip();
+        tipEl = document.createElement("div");
+        tipEl.className = "x-tip r-" + def.r; tipEl.setAttribute("role", "tooltip");
+        tipEl.innerHTML = "<b>" + def.icon + " " + def.name + "</b><small>" + RARITY[def.r].label + "</small>" + def.d + (c.id === "sigma" ? " (now +" + (c.stack || 0) + ")" : "") + (c.id === "brainrot" ? ". Preview counts it as x1." : "");
+        document.body.appendChild(tipEl);
+        var w = tipEl.offsetWidth, x = Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width / 2 - w / 2));
+        tipEl.style.left = x + "px"; tipEl.style.top = r.bottom + 8 + "px";
+        tipT = setTimeout(hideTip, 2500);
+      }
+      $("charms").addEventListener("click", function (e) { var el = e.target.closest(".x-charm"); if (el) { e.stopPropagation(); var same = tipEl && tipEl._for === el; hideTip(); if (!same) { showTip(el); if (tipEl) tipEl._for = el; } } });
+      $("charms").addEventListener("keydown", function (e) { if ((e.key === "Enter" || e.key === " ") && e.target.classList.contains("x-charm")) { e.preventDefault(); e.target.click(); } });
+      document.addEventListener("click", hideTip);
+      function renderHUD() {
+        $("h-round").textContent = S.round + (S.endless ? "∞" : "/8");
+        $("h-hands").textContent = S.hands;
+        $("h-rerolls").textContent = S.rerolls;
+        if (!coinFx) $("h-coins").textContent = "$" + S.coins;
+        $("g-score").textContent = fmt(S.score);
+        var tgt = targetFor(S.round);
+        $("g-target").textContent = fmt(tgt);
+        $("g-bar").style.width = Math.min(100, (S.score / tgt) * 100) + "%";
+        $("goal").classList.toggle("is-boss", !!S.curse);
+        $("g-curse").hidden = !S.curse;
+        if (S.curse) $("g-curse").textContent = "BOSS ROUND · " + S.curse.text;
+        $("btn-reroll").textContent = "Reroll · " + S.rerolls;
+        $("btn-reroll").disabled = busy || S.rerolls <= 0;
+        $("btn-play").disabled = busy;
+        var bars = $("heat").querySelectorAll("i");
+        for (var i = 0; i < 3; i++) bars[i].classList.toggle("on", S.onFire || i < S.heat);
+        $("heat").classList.toggle("is-lit", S.onFire);
+        $("heat").firstChild.textContent = S.onFire ? "ON FIRE x2" : "Heat";
+        updateProj();
+        renderBoard();
+      }
+      function renderBoard() {
+        var b = $("board");
+        b.hidden = S.mode !== "party";
+        if (b.hidden) return;
+        var you = S.players[0];
+        you.round = S.round; you.score = S.score;
+        var sorted = S.players.slice().sort(function (a, c) { return (a.out - c.out) || (c.round - a.round) || (c.score - a.score); });
+        b.innerHTML = sorted.map(function (p, i) {
+          return '<div class="x-bot' + (p.isBot ? "" : " is-you") + (p.out ? " is-out" : "") + '" title="' + p.name + '"><b>' + (i + 1) + ". " + p.name + "</b><span>" + (p.out ? "💀 R" + p.round : "R" + p.round + " · <u>" + fmt(Math.round(p.score)) + "</u>") + "</span></div>";
+        }).join("");
+      }
+
+      /* ---------- round loop ---------- */
+      var busy = false;
+      function startRound() {
+        var boss = S.round % 3 === 0;
+        S.curse = boss ? curseFor(S.round) : null;
+        S.score = 0;
+        S.hands = 4 + S.bonusHands + has("rent").length;
+        S.rerolls = S.curse && S.curse.id === "onereroll" ? 1 : 3 + S.bonusRerolls;
+        S.dice = [0, 0, 0, 0, 0].map(function () { return { v: 1, held: false, gold: false }; });
+        show("s-game");
+        $("calc").innerHTML = boss ? '<span class="m">BOSS</span>' : "";
+        rollDice(true);
+        renderCharms();
+        renderHUD();
+      }
+      function rollDice(all) {
+        var rolled = [];
+        S.dice.forEach(function (d, i) {
+          if (all) d.held = false;
+          if (!d.held) { d.v = 1 + rnd(6); d.gold = rng() < 0.05; rolled.push(i); }
+        });
+        SFX.roll();
+        renderDice(rolled);
+      }
+      function toggleHold(i) {
+        if (busy) return;
+        if (S.curse && S.curse.id === "nohold") { popText("NO HOLDING 😭", "var(--x-pink)", 22); SFX.bad(); return; }
+        var d = S.dice[i], el = $("dice").children[i];
+        d.held = !d.held;
+        d.held ? SFX.click() : tone(300, 0.05, "square", 0.06, 200);
+        if (el) {
+          el.classList.toggle("is-held", d.held);
+          el.classList.remove("is-roll");
+          el.style.animationDelay = ""; el.style.animationDuration = "";
+          el.setAttribute("aria-label", "Die showing " + d.v + (d.held ? ", held" : "") + (d.gold ? ", golden" : ""));
+        }
+        updateProj();
+      }
+      $("btn-reroll").onclick = function () {
+        if (busy || S.rerolls <= 0) return;
+        if (S.dice.every(function (d) { return d.held; })) { popText("unhold one bestie", "var(--x-cyan)", 20); return; }
+        S.rerolls--;
+        rollDice(false);
+        renderHUD();
+      };
+      $("btn-play").onclick = function () { if (!busy) playHand(); };
+
+      function wiggle(i) {
+        var el = $("charms").querySelector('[data-i="' + i + '"]');
+        if (!el) return;
+        el.classList.remove("is-fire"); void el.offsetWidth; el.classList.add("is-fire");
+      }
+      function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+      function charmSteps(h, held, lastHand, brain) {
+        var steps = [];
+        S.charms.forEach(function (c, i) {
+          var id = c.id;
+          if (id === "main") steps.push({ i: i, m: 4 });
+          if (id === "rizz" && held) steps.push({ i: i, m: held });
+          if (id === "grass" && S.rerolls > 0) steps.push({ i: i, c: 30 });
+          if (id === "roman" && (h.key === "small" || h.key === "large")) steps.push({ i: i, c: 50 });
+          if (id === "sigma" && c.stack) steps.push({ i: i, m: c.stack });
+          if (id === "unc" && lastHand) steps.push({ i: i, m: 10 });
+          if (id === "fanum") steps.push({ i: i, $: 1 });
+        });
+        S.charms.forEach(function (c, i) {
+          var id = c.id;
+          if (id === "delulu" && (h.key === "pair" || h.key === "two")) steps.push({ i: i, x: 2 });
+          if (id === "gyatt" && h.key === "full") steps.push({ i: i, x: 3 });
+          if (id === "slayq" && h.key === "five") steps.push({ i: i, x: 3 });
+          if (id === "brainrot") steps.push({ i: i, x: brain() });
+        });
+        return steps;
+      }
+      // pure projection of the current dice: same rules as playHand, brainrot at its floor (x1), no rng or state writes
+      function projectScore() {
+        var h = detect(S.dice.map(function (d) { return d.v; })), H = HANDS[h.key], chips = H.chips, mult = H.mult, rot = false;
+        var sixDead = S.curse && S.curse.id === "sixes", held = S.dice.filter(function (d) { return d.held; }).length;
+        h.idx.forEach(function (k) { var d = S.dice[k]; chips += sixDead && d.v === 6 ? 0 : d.v; if (d.gold) mult *= 1.5; });
+        charmSteps(h, held, S.hands === 1, function () { rot = true; return 1; }).forEach(function (st) { if (st.c) chips += st.c; if (st.m) mult += st.m; if (st.x) mult *= st.x; });
+        if (S.onFire) mult *= 2;
+        return { total: Math.round(chips * mult), rot: rot };
+      }
+      function updateProj() {
+        var el = $("proj");
+        if (!el || !S || busy || S.hands <= 0) { if (el) el.textContent = ""; return; }
+        var p = projectScore(), win = S.score + p.total >= targetFor(S.round);
+        el.textContent = "≈ " + fmt(p.total) + (p.rot ? "+" : "") + " pts" + (win ? " · clears it ✅" : "");
+        el.classList.toggle("is-win", win);
+      }
+      function showCalc(ch, mu, flash) {
+        var fc = flash === "c" ? " is-flash" : "", fm = flash === "m" ? " is-flash" : flash === "m-big" ? " is-flash-big" : "";
+        $("calc").innerHTML = '<span class="c' + fc + '">' + fmt(Math.round(ch)) + '</span> <span class="x">×</span> <span class="m' + fm + '">' + (Math.round(mu * 10) / 10) + "</span>";
+      }
+
+      async function playHand() {
+        busy = true;
+        renderHUD();
+        var vals = S.dice.map(function (d) { return d.v; });
+        var h = detect(vals);
+        var H = HANDS[h.key];
+        var sixDead = S.curse && S.curse.id === "sixes";
+        var chips = H.chips, mult = H.mult;
+        var held = S.dice.filter(function (d) { return d.held; }).length;
+        var lastHand = S.hands === 1;
+        S.hands--;
+        S.stats.hands++;
+        showCalc(chips, mult);
+        SFX.tick();
+        await sleep(280);
+        // dice faces
+        var dieEls = $("dice").children;
+        for (var k = 0; k < h.idx.length; k++) {
+          var d = S.dice[h.idx[k]];
+          var add = sixDead && d.v === 6 ? 0 : d.v;
+          chips += add;
+          var el = dieEls[h.idx[k]];
+          if (el) {
+            el.classList.remove("is-roll", "x-hit"); void el.offsetWidth; el.classList.add("x-hit");
+            (function (e2) { setTimeout(function () { e2.classList.remove("x-hit"); }, 360); })(el);
+            floatAt(el, "+" + add, add ? "var(--x-cyan)" : "var(--x-dim)");
+          }
+          if (d.gold) {
+            mult *= 1.5; S.coins += 2; S.stats.earned += 2;
+            if (el) { (function (e2) { setTimeout(function () { floatAt(e2, "×1.5", "var(--x-pink)", -26); }, 120); })(el); coinPayout(el, 2); }
+          }
+          showCalc(chips, mult, d.gold ? "m" : "c");
+          tone(640 + k * 110, 0.06, "square", 0.06);
+          await sleep(210);
+        }
+        // charms: additive first, then multipliers (shared with the live preview)
+        var steps = charmSteps(h, held, lastHand, function () { return 1 + rnd(4); });
+        for (var s = 0; s < steps.length; s++) {
+          var st = steps[s];
+          if (st.c) chips += st.c;
+          if (st.m) mult += st.m;
+          if (st.x) mult *= st.x;
+          var cEl = $("charms").querySelector('[data-i="' + st.i + '"]');
+          if (st.$) { S.coins += st.$; S.stats.earned += st.$; if (cEl) coinPayout(cEl, st.$); }
+          wiggle(st.i);
+          if (cEl) floatAt(cEl, st.c ? "+" + st.c : st.m ? "+" + st.m + " mult" : st.x ? "×" + st.x : "+$" + st.$, st.c ? "var(--x-cyan)" : st.$ ? "var(--x-gold)" : "var(--x-pink)");
+          showCalc(chips, mult, st.c ? "c" : st.m || st.x ? "m" : null);
+          SFX.tick();
+          renderHUD();
+          await sleep(260);
+        }
+        if (S.onFire) {
+          mult *= 2;
+          S.onFire = false;
+          popText("ON FIRE x2 🔥", "var(--x-gold)", 26);
+          showCalc(chips, mult, "m");
+          await sleep(350);
+        }
+        var total = Math.round(chips * mult);
+        // mult flash, then the total slams in
+        showCalc(chips, mult, "m-big");
+        tone(980, 0.12, "sawtooth", 0.07, 1400);
+        await sleep(420);
+        $("calc").innerHTML = '<span class="x-slam">' + fmt(total) + "</span>";
+        tone(110, 0.28, "square", 0.12, 50);
+        shake(Math.min(3, 0.35 + (2.2 * total) / targetFor(S.round)));
+        await sleep(200);
+        // heat
+        if (H.rank >= 3) { S.heat++; if (S.heat >= 3) { S.heat = 0; S.onFire = true; } } else S.heat = 0;
+        // stats
+        S.stats.total += total;
+        if (total > S.stats.best) { S.stats.best = total; S.stats.bestHand = H.name; }
+        // juice
+        if (h.key === "five") {
+          S.stats.slays++;
+          SFX.slay();
+          shake(3);
+          confetti(70);
+          popText("SLAY", "var(--x-pink)", 64);
+        } else if (H.rank >= 4 || total >= targetFor(S.round) * 0.5) {
+          SFX.ching();
+          popText(pick(POPS), "var(--x-gold)", 40);
+        } else {
+          SFX.ching();
+        }
+        await countUp(S.score, S.score + total);
+        S.score += total;
+        net.emit("hand", { hand: h.key, total: total, score: S.score });
+        renderHUD();
+        await sleep(350);
+        busy = false;
+        if (S.mode === "party" && (H.rank >= 5 || total >= targetFor(S.round) * 0.5)) {
+          var live = S.players.filter(function (p) { return p.isBot && !p.out; });
+          if (live.length) setTimeout(function () { emote(mpick(["💀", "🔥", "😭"]), mpick(live).name); }, 500);
+        }
+        if (S.score >= targetFor(S.round)) return clearRound();
+        if (S.hands <= 0) {
+          if (S.score >= targetFor(S.round) * 0.85) {
+            busy = true;
+            renderHUD();
+            popText("SO CLOSE 😭", "var(--x-pink)", 46);
+            SFX.bad();
+            shake(1);
+            setTimeout(function () { gameOver(false); }, 1300);
+            return;
+          }
+          return gameOver(false);
+        }
+        rollDice(true);
+        renderHUD();
+      }
+      function countUp(from, to) {
+        return new Promise(function (res) {
+          var t0 = performance.now(), dur = 700, lastTick = 0, lastSpark = 0, bar = $("g-bar");
+          bar.parentNode.classList.add("is-filling");
+          function step(t) {
+            var p = Math.min(1, (t - t0) / dur);
+            var e = 1 - Math.pow(1 - p, 3);
+            var wantSpark = t - lastSpark > 110 && p < 0.95, br = wantSpark ? bar.getBoundingClientRect() : null;
+            $("g-score").textContent = fmt(Math.round(from + (to - from) * e));
+            bar.style.width = Math.min(100, ((from + (to - from) * e) / targetFor(S.round)) * 100) + "%";
+            if (t - lastTick > 60) { SFX.tick(); lastTick = t; }
+            if (wantSpark) {
+              lastSpark = t;
+              if (br.width > 2) sparks(br.right, br.top + br.height / 2, Math.random() < 0.5 ? "#9dff3c" : "#2de2ff", 2, 34, -1);
+            }
+            if (p < 1) requestAnimationFrame(step);
+            else { setTimeout(function () { bar.parentNode.classList.remove("is-filling"); }, 350); res(); }
+          }
+          requestAnimationFrame(step);
+        });
+      }
+
+      /* ---------- fx ---------- */
+      function popText(txt, color, size) {
+        var p = document.createElement("div");
+        p.className = "x-pop";
+        p.textContent = txt;
+        p.style.color = color;
+        if (size) p.style.fontSize = size + "px";
+        $("fx").appendChild(p);
+        setTimeout(function () { p.remove(); }, 950);
+      }
+      function shake(k) {
+        k = k == null ? 1 : Math.max(0.2, k);
+        var g = $("s-game");
+        g.style.setProperty("--sk", k.toFixed(2));
+        g.style.setProperty("--skd", (0.3 + k * 0.15).toFixed(2) + "s");
+        g.classList.remove("x-shake"); void g.offsetWidth; g.classList.add("x-shake");
+      }
+      function floatAt(el, txt, color, dy) {
+        var r = el.getBoundingClientRect();
+        if (!r.width) return;
+        var f = document.createElement("div");
+        f.className = "x-float";
+        f.textContent = txt;
+        f.style.color = color;
+        f.style.left = r.left + r.width / 2 + "px";
+        f.style.top = r.top + (dy || 0) + "px";
+        $("fx").appendChild(f);
+        setTimeout(function () { f.remove(); }, 950);
+      }
+      var sparkLive = 0, sparkPool = [];
+      function sparks(x, y, color, n, dist, up) {
+        var frag = document.createDocumentFragment();
+        for (var i = 0; i < n && sparkLive < 60; i++) {
+          var s = sparkPool.pop() || document.createElement("i"), a = up ? -Math.PI / 2 + (Math.random() - 0.5) * 2.2 : Math.random() * Math.PI * 2, d = dist * (0.5 + Math.random() * 0.7);
+          s.className = "x-spark";
+          s.style.setProperty("--c", color);
+          s.style.setProperty("--x0", x + "px");
+          s.style.setProperty("--y0", y + "px");
+          s.style.setProperty("--dx", Math.cos(a) * d + "px");
+          s.style.setProperty("--dy", Math.sin(a) * d + "px");
+          s.style.setProperty("--sd", 0.45 + Math.random() * 0.35 + "s");
+          frag.appendChild(s);
+          sparkLive++;
+          (function (el) { setTimeout(function () { el.remove(); sparkLive--; if (sparkPool.length < 60) sparkPool.push(el); }, 850); })(s);
+        }
+        if (frag.firstChild) $("fx").appendChild(frag);
+      }
+      function burst(x, y, color, k) {
+        var b = document.createElement("div");
+        b.className = "x-burst";
+        b.style.setProperty("--c", color);
+        b.style.setProperty("--x0", x + "px");
+        b.style.setProperty("--y0", y + "px");
+        b.style.setProperty("--bs", 3.5 * k);
+        $("fx").appendChild(b);
+        setTimeout(function () { b.remove(); }, 750);
+        sparks(x, y, color, Math.round(18 * k), 150 * k);
+      }
+      /* coins fly into the bag, then the counter ticks up */
+      var coinFx = 0;
+      function coinPayout(srcEl, amount) {
+        var dst = $("h-coins"), dr = dst.getBoundingClientRect(), sr = srcEl.getBoundingClientRect();
+        if (!dr.width || !sr.width) return;
+        var from = parseInt(dst.textContent.replace(/[^0-9]/g, ""), 10) || 0;
+        coinFx++;
+        var n = Math.max(6, Math.min(10, 5 + amount)), sx = sr.left + sr.width / 2, sy = sr.top + sr.height / 2, tx = dr.left + dr.width / 2, ty = dr.top + dr.height / 2;
+        var coins = [], landed = 0, ticking = false;
+        for (var i = 0; i < n; i++) {
+          var c = document.createElement("div");
+          c.className = "x-coin";
+          c.textContent = "🪙";
+          c.style.opacity = "0";
+          $("fx").appendChild(c);
+          coins.push({ el: c, delay: i * 45, dur: 520 + Math.random() * 240, ox: (Math.random() - 0.5) * 160, oy: -50 - Math.random() * 110, spin: (Math.random() - 0.5) * 720 });
+        }
+        function tick() {
+          ticking = true;
+          var t1 = performance.now(), to = S.coins;
+          (function run(t) {
+            var p = Math.min(1, (t - t1) / 520);
+            dst.textContent = "$" + Math.round(from + (to - from) * (1 - Math.pow(1 - p, 2)));
+            if (p < 1) return requestAnimationFrame(run);
+            coinFx = Math.max(0, coinFx - 1);
+            if (!coinFx) dst.textContent = "$" + S.coins;
+          })(t1);
+        }
+        var t0 = performance.now();
+        function frame(t) {
+          var alive = false;
+          coins.forEach(function (c) {
+            if (c.done) return;
+            var p = (t - t0 - c.delay) / c.dur;
+            if (p < 0) { alive = true; return; }
+            if (p >= 1) {
+              c.done = true; c.el.remove(); landed++;
+              tone(1300 + landed * 60, 0.04, "triangle", 0.05);
+              var cell = dst.parentNode;
+              cell.classList.remove("is-bump"); void cell.offsetWidth; cell.classList.add("is-bump");
+              if (!ticking) tick();
+              return;
+            }
+            alive = true;
+            var e = p * p * (3 - 2 * p), u = 1 - e, cx = sx + c.ox, cy = sy + c.oy;
+            var x = u * u * sx + 2 * u * e * cx + e * e * tx, y = u * u * sy + 2 * u * e * cy + e * e * ty;
+            c.el.style.opacity = "1";
+            c.el.style.transform = "translate(" + x + "px," + y + "px) translate(-50%,-50%) rotate(" + c.spin * e + "deg) scale(" + (1.1 - 0.5 * e) + ")";
+          });
+          if (alive) requestAnimationFrame(frame);
+          else setTimeout(function () { dst.parentNode.classList.remove("is-bump"); }, 320);
+        }
+        requestAnimationFrame(frame);
+      }
+      /* ambient particles, capped at 20 (10 on phones) */
+      (function () {
+        var bg = $("bg"), count = Math.min(window.innerWidth || 0, screen.width || 9999) < 500 ? 10 : 20;
+        for (var i = 0; i < count; i++) {
+          var m = document.createElement("i"), s = 2 + Math.random() * 4;
+          m.className = "x-mote";
+          m.style.left = Math.random() * 100 + "%";
+          m.style.width = m.style.height = s + "px";
+          m.style.background = ["#ffffff", "#ff2d95", "#2de2ff", "#9dff3c", "#b061ff"][i % 5];
+          m.style.setProperty("--o", (0.12 + Math.random() * 0.2).toFixed(2));
+          m.style.setProperty("--dx", (Math.random() - 0.5) * 140 + "px");
+          m.style.animationDuration = 16 + Math.random() * 18 + "s";
+          m.style.animationDelay = -Math.random() * 30 + "s";
+          bg.appendChild(m);
+        }
+      })();
+      function confetti(n) {
+        var cols = ["#ff2d95", "#9dff3c", "#2de2ff", "#ffc53d", "#b061ff"];
+        for (var i = 0; i < n; i++) {
+          var c = document.createElement("i");
+          c.className = "x-conf";
+          c.style.left = Math.random() * 100 + "vw";
+          c.style.top = -20 - Math.random() * 120 + "px";
+          c.style.background = cols[Math.floor(Math.random() * cols.length)];
+          c.style.animationDelay = Math.random() * 0.4 + "s";
+          c.style.animationDuration = 1.1 + Math.random() * 0.9 + "s";
+          $("fx").appendChild(c);
+          (function (el) { setTimeout(function () { el.remove(); }, 2600); })(c);
+        }
+      }
+      function emote(e, who) {
+        var el = document.createElement("div");
+        el.className = "x-emote";
+        el.innerHTML = e + (who ? '<div style="font-size:12px;font-weight:600;color:var(--x-dim)">' + who + "</div>" : "");
+        el.style.right = 64 + Math.floor(Math.random() * 90) + "px";
+        el.style.bottom = 120 + Math.floor(Math.random() * 160) + "px";
+        if (e === "W") el.style.color = "var(--x-green)";
+        if (e === "L") el.style.color = "var(--x-pink)";
+        el.style.fontWeight = "800";
+        $("fx").appendChild(el);
+        setTimeout(function () { el.remove(); }, 1350);
+      }
+      Array.prototype.forEach.call($("emotes").querySelectorAll("button"), function (b) {
+        b.onclick = function () { if (!(S && S.online)) emote(b.dataset.e, "you"); SFX.click(); net.emit("emote", { e: b.dataset.e }); };
+      });
+
+      /* ---------- net stub: swap for a real transport later ---------- */
+      var net = { emit: function (type, payload) { /* online multiplayer hook */ } };
+
+      /* ---------- bots ---------- */
+      // pacing uses Math.random so the seeded rng() sequence stays identical across players
+      function mpick(a) { return a[Math.floor(Math.random() * a.length)]; }
+      var botTimer = 0;
+      function botsWanted() { return !!(S && S.mode === "party" && !S.online && !document.hidden && $("s-game").classList.contains("is-on")); }
+      function syncBots() {
+        if (botsWanted()) { if (!botTimer) botTimer = setInterval(botTick, 2600); }
+        else if (botTimer) { clearInterval(botTimer); botTimer = 0; }
+      }
+      function botTick() {
+        if (!botsWanted()) return syncBots();
+        S.players.forEach(function (p) {
+          if (!p.isBot || p.out) return;
+          var tgt = targetFor(p.round);
+          p.score += tgt * (0.08 + Math.random() * 0.28) * p.pace;
+          if (p.round >= p.bust && p.score > tgt * (0.5 + Math.random() * 0.4)) {
+            p.out = true;
+            emote(mpick(["💀", "😭", "L"]), p.name);
+            return;
+          }
+          if (p.score >= tgt) {
+            p.round++;
+            p.score = 0;
+            if (Math.random() < 0.35) emote(mpick(["🔥", "W"]), p.name);
+          } else if (Math.random() < 0.04) emote(mpick(BOT_EMOTES), p.name);
+        });
+        renderBoard();
+      }
+      document.addEventListener("visibilitychange", function () {
+        document.documentElement.classList.toggle("x-paused", document.hidden);
+        syncBots();
+      });
+
+      /* ---------- clear / shop ---------- */
+      function clearRound() {
+        var interest = Math.min(5, Math.floor(S.coins / 5));
+        var reward = 4 + S.hands + interest;
+        S.coins += reward;
+        S.stats.earned += reward;
+        S.stats.cleared++;
+        S.charms.forEach(function (c) { if (c.id === "sigma") c.stack = (c.stack || 0) + 1; });
+        SFX.ching();
+        confetti(30);
+        if (S.round === 8 && !S.endless) return gameOver(true);
+        S.round++;
+        var note = "Cleared! +$" + reward + " (4 base, " + S.hands + " unused hands, " + interest + " interest)";
+        busy = true;
+        coinPayout($("goal"), reward);
+        renderHUD();
+        SFX.slay();
+        confetti(40);
+        var v = document.createElement("div");
+        v.className = "x-vibe";
+        v.innerHTML = "<b>VIBE CHECK<br>PASSED</b>";
+        $("fx").appendChild(v);
+        setTimeout(function () {
+          v.remove();
+          busy = false;
+          openShop(note);
+          popText("+$" + reward, "var(--x-green)", 46);
+        }, 1600);
+      }
+      function rollOffers() {
+        var owned = S.charms.map(function (c) { return c.id; });
+        var pool = CHARMS.filter(function (c) { return owned.indexOf(c.id) < 0; });
+        S.shop = [];
+        for (var i = 0; i < 3 && pool.length; i++) {
+          var c = pool.splice(rnd(pool.length), 1)[0];
+          S.shop.push({ id: c.id, sold: false });
+        }
+      }
+      function openShop(note) {
+        rollOffers();
+        show("s-shop");
+        $("shop-note").textContent = note || "";
+        renderShop();
+      }
+      function renderShop() {
+        $("shop-bag").textContent = "Bag: $" + S.coins + " · Charms " + S.charms.length + "/5 · Next target " + fmt(targetFor(S.round)) + (S.round % 3 === 0 ? " (BOSS)" : "");
+        var br = Math.ceil(S.round / 3) * 3;
+        $("shop-boss").textContent = "NEXT UP: Round " + br + " boss — " + curseFor(br).text.replace(/^☠ Curse: /, "") + " · target " + fmt(targetFor(br));
+        $("shelf").innerHTML = S.shop.map(function (o, i) {
+          var d = charmDef(o.id), price = RARITY[d.r].price;
+          var can = !o.sold && S.coins >= price && S.charms.length < 5;
+          return '<div class="x-offer r-' + d.r + (o.sold ? " is-sold" : "") + '"><i>' + d.icon + "</i><b>" + d.name + '</b><span class="x-dim" style="font-size:12px">' + RARITY[d.r].label + "</span><span>" + d.d + '</span><button class="x-btn x-btn--pink" data-buy="' + i + '"' + (can ? "" : " disabled") + ">" + (o.sold ? "Copped" : "$" + price) + "</button></div>";
+        }).join("") || '<p class="x-empty">You own every charm. Menace.</p>';
+        Array.prototype.forEach.call($("shelf").querySelectorAll("[data-buy]"), function (b) {
+          b.onclick = function () { buy(+b.dataset.buy); };
+        });
+        $("shop-charms").innerHTML = S.charms.length ? S.charms.map(function (c, i) { return charmTile(c, i, true); }).join("") : '<p class="x-empty">Empty. Cop something.</p>';
+        Array.prototype.forEach.call($("shop-charms").querySelectorAll(".x-charm"), function (el) {
+          el.onclick = function () { sell(+el.dataset.i); };
+        });
+        $("shop-reroll").disabled = S.coins < 2;
+        $("mystery").disabled = unboxing || S.coins < 5 || S.charms.length >= 5;
+      }
+      function buy(i) {
+        var o = S.shop[i], d = charmDef(o.id), price = RARITY[d.r].price;
+        if (unboxing || o.sold || S.coins < price || S.charms.length >= 5) return;
+        S.coins -= price;
+        o.sold = true;
+        S.charms.push({ id: o.id, stack: 0 });
+        SFX.ching();
+        $("shop-note").textContent = d.name + " equipped. " + pick(["it's giving rich", "W purchase", "lowkey fire"]);
+        renderShop();
+      }
+      function sell(i) {
+        if (unboxing || !S.charms[i]) return;
+        var c = S.charms[i], d = charmDef(c.id), back = Math.floor(RARITY[d.r].price / 2);
+        S.charms.splice(i, 1);
+        S.coins += back;
+        SFX.click();
+        $("shop-note").textContent = "Sold " + d.name + " for $" + back + ".";
+        renderShop();
+      }
+      $("shop-reroll").onclick = function () {
+        if (S.coins < 2) return;
+        S.coins -= 2;
+        rollOffers();
+        SFX.roll();
+        $("shop-note").textContent = "Fresh drip.";
+        renderShop();
+      };
+      function randomCharmByRarity(rarity) {
+        var owned = S.charms.map(function (c) { return c.id; });
+        var pool = CHARMS.filter(function (c) { return owned.indexOf(c.id) < 0 && (!rarity || c.r === rarity); });
+        if (!pool.length) pool = CHARMS.filter(function (c) { return owned.indexOf(c.id) < 0; });
+        return pool.length ? pick(pool) : null;
+      }
+      function rollRarity() {
+        var keys = Object.keys(RARITY), sum = 0, r;
+        keys.forEach(function (k) { sum += RARITY[k].w; });
+        r = rng() * sum;
+        for (var i = 0; i < keys.length; i++) { r -= RARITY[keys[i]].w; if (r < 0) return keys[i]; }
+        return "common";
+      }
+      var GLOW = { common: "#9aa0ad", rare: "#4da3ff", epic: "#b061ff", legendary: "#ffc53d" };
+      var unboxing = false;
+      $("mystery").onclick = function () {
+        if (unboxing || S.coins < 5 || S.charms.length >= 5) return;
+        var c = randomCharmByRarity(rollRarity());
+        if (!c) { $("shop-note").textContent = "Nothing left to unbox."; return; }
+        S.coins -= 5;
+        unboxing = true;
+        $("shop-next").disabled = true;
+        var box = $("mystery");
+        box.disabled = true;
+        $("shop-note").textContent = "unboxing... 😳";
+        SFX.roll();
+        var br = box.getBoundingClientRect(), bx = br.left + br.width / 2, by = br.top + br.height / 2;
+        var rays = document.createElement("div");
+        rays.className = "x-rays";
+        $("fx").appendChild(rays);
+        box.style.transition = "none";
+        var ut0 = performance.now(), udur = 1500, ulast = 0;
+        function suspense(t) {
+          var p = Math.min(1, (t - ut0) / udur), a = 1 + p * p * 9;
+          box.style.transform = "translate(" + (Math.random() - 0.5) * 2 * a + "px," + (Math.random() - 0.5) * 1.2 * a + "px) rotate(" + (Math.random() - 0.5) * a * 0.9 + "deg) scale(" + (1 + p * 0.08) + ")";
+          box.style.boxShadow = "0 0 " + Math.round(8 + p * 34) + "px rgba(255,255,255," + (0.15 + p * 0.55).toFixed(2) + ")";
+          rays.style.opacity = (p * 0.9).toFixed(2);
+          rays.style.transform = "translate(" + bx + "px," + by + "px) translate(-50%,-50%) rotate(" + p * p * 220 + "deg) scale(" + (0.35 + p * 0.85) + ")";
+          if (t - ulast > 240 - p * 180) { tone(500 + p * 900, 0.04, "square", 0.05); ulast = t; }
+          if (p < 1) requestAnimationFrame(suspense); else reveal();
+        }
+        requestAnimationFrame(suspense);
+        function reveal() {
+          rays.remove();
+          box.style.transform = ""; box.style.boxShadow = ""; box.style.transition = "";
+          burst(bx, by, GLOW[c.r], c.r === "legendary" ? 1.7 : c.r === "epic" ? 1.3 : 1);
+          unboxing = false;
+          $("shop-next").disabled = false;
+          S.charms.push({ id: c.id, stack: 0 });
+          if (c.r === "legendary") { SFX.slay(); confetti(50); } else SFX.ching();
+          popText(RARITY[c.r].label.toUpperCase() + "!", GLOW[c.r], 38);
+          $("shop-note").textContent = "Pulled " + c.icon + " " + c.name + " (" + RARITY[c.r].label + "): " + c.d;
+          renderShop();
+        }
+      };
+      $("shop-next").onclick = function () { if (unboxing) return; SFX.click(); startRound(); };
+
+      /* ---------- game over ---------- */
+      function gameOver(won) {
+        busy = false;
+        show("s-over");
+        $("over-title").textContent = won ? "you are HIM" : "it's so over";
+        if (won) { SFX.slay(); confetti(90); } else SFX.bad();
+        var place = "";
+        if (S.mode === "party") {
+          var you = S.players[0];
+          you.round = S.round; you.score = S.score; you.out = !won;
+          var better = S.players.filter(function (p) { return p.isBot && (won ? p.round > 8 && !p.out : p.round > S.round || (p.round === S.round && !p.out)); }).length;
+          place = " · placed #" + (better + 1) + " of 4";
+        }
+        $("over-sub").textContent = won ? "All 8 rounds cleared. Endless is open, targets x2.2 each round." : "Busted on round " + S.round + " (target " + fmt(targetFor(S.round)) + ")" + place;
+        if (S.day) $("over-sub").textContent = "Daily · " + S.day + " · " + $("over-sub").textContent;
+        var st = S.stats, reached = won ? "8 ✅" : S.round + (S.endless ? "∞" : "");
+        var cells = [
+          ["Round reached", reached],
+          ["Total score", fmt(st.total)],
+          ["Best · " + (st.bestHand || "none"), st.best ? fmt(st.best) : "0"],
+          ["Hands · SLAYs", st.hands + " · " + st.slays],
+          ["Coins earned", "$" + st.earned],
+          ["Rounds cleared", st.cleared]
+        ];
+        $("over-stats").innerHTML = cells.map(function (c) { return '<div class="x-cell"><b>' + c[1] + "</b><span>" + c[0] + "</span></div>"; }).join("");
+        $("over-charms").textContent = S.charms.map(function (c) { return charmDef(c.id).icon; }).join("") || "no charms 🫥";
+        $("over-charms").title = S.charms.map(function (c) { return charmDef(c.id).name; }).join(", ");
+        var k = function (n) { return n >= 1000 ? (Math.round(n / 100) / 10) + "k" : String(n); };
+        $("share-txt").textContent = "LOADED! 🎲 " + (S.day ? "Daily " + S.day : S.online ? "Online" : S.mode === "party" ? "Vs Bots" : "Solo") + " · " + (won ? "Cleared all 8 👑" : "Round " + S.round) + " · " + k(st.total) + (st.bestHand ? " · best: " + st.bestHand + " 🔥" : "");
+        $("share").textContent = "Share result";
+        $("endless").hidden = !won;
+      }
+      $("share").onclick = function () {
+        var b = this, txt = $("share-txt").textContent;
+        SFX.click();
+        function done() { b.textContent = "copied ✅"; setTimeout(function () { b.textContent = "Share result"; }, 1600); }
+        function fb() {
+          var r = document.createRange(), sel = getSelection(); r.selectNodeContents($("share-txt")); sel.removeAllRanges(); sel.addRange(r);
+          try { if (document.execCommand("copy")) return done(); } catch (e) {}
+          b.textContent = "text selected, copy it 👆";
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, fb); else fb();
+      };
+      $("again").onclick = function () { SFX.click(); $("fx").innerHTML = ""; beginRun(S ? S.mode : "solo"); };
+      $("endless").onclick = function () {
+        S.endless = true;
+        S.round = 9;
+        SFX.click();
+        openShop("Endless mode. Targets x2.2 every round.");
+      };
+
+      /* ---------- wheel ---------- */
+      var wheelAngle = 0, wheelResult = null;
+      (function buildWheel() {
+        var stops = WHEEL.map(function (w, i) { return w.color + " " + i * 60 + "deg " + (i + 1) * 60 + "deg"; }).join(",");
+        $("wheel").style.background = "conic-gradient(" + stops + ")";
+        $("slices").innerHTML = WHEEL.map(function (w, i) {
+          var a = i * 60 + 30 - 90, flip = a > 90 && a < 270;
+          return '<span' + (flip ? ' class="x-flip"' : "") + ' style="transform: rotate(' + (flip ? a - 180 : a) + 'deg)">' + w.label + "</span>";
+        }).join("");
+      })();
+      function beginRun(mode) {
+        newRun(mode);
+        wheelResult = null;
+        $("spin").disabled = false;
+        $("wheel-go").disabled = true;
+        $("wheel-note").textContent = "One free buff. No take-backs.";
+        show("s-wheel");
+      }
+      $("spin").onclick = function () {
+        this.disabled = true;
+        var sum = 0, r, i;
+        WHEEL.forEach(function (w) { sum += w.w; });
+        r = rng() * sum;
+        for (i = 0; i < WHEEL.length; i++) { r -= WHEEL[i].w; if (r < 0) break; }
+        i = Math.min(i, WHEEL.length - 1);
+        var jitter = (rng() - 0.5) * 40;
+        var base = Math.ceil(wheelAngle / 360) * 360 + 360 * 5;
+        wheelAngle = base - (i * 60 + 30) + jitter;
+        $("wheel").style.transform = "rotate(" + wheelAngle + "deg)";
+        $("wheel-note").textContent = "spinning... 😳";
+        // ticks that slow down
+        var t = 0, gap = 50;
+        (function tick() {
+          if (t > 4400) return;
+          SFX.tick();
+          t += gap; gap *= 1.12;
+          setTimeout(tick, gap);
+        })();
+        setTimeout(function () { applyWheel(WHEEL[i]); }, 4700);
+      };
+      function applyWheel(w) {
+        wheelResult = w.id;
+        var msg = "";
+        if (w.id === "c3") { S.coins += 3; msg = "+$3. Small W."; }
+        if (w.id === "c5") { S.coins += 5; msg = "+$5. Bet."; }
+        if (w.id === "hand") { S.bonusHands += 1; msg = "+1 hand every round this run."; }
+        if (w.id === "reroll") { S.bonusRerolls += 1; msg = "+1 reroll every round this run."; }
+        if (w.id === "rare") {
+          var c = randomCharmByRarity("rare");
+          S.charms.push({ id: c.id, stack: 0 });
+          msg = "Free Rare: " + c.icon + " " + c.name + " (" + c.d + ")";
+        }
+        if (w.id === "jack") { S.coins += 15; msg = "JACKPOT +$15. Built different."; SFX.slay(); confetti(60); }
+        else SFX.ching();
+        popText(w.label, "var(--x-green)", 40);
+        $("wheel-note").textContent = msg;
+        $("wheel-go").disabled = false;
+      }
+      $("wheel-go").onclick = function () { SFX.click(); startRound(); };
+
+      /* ---------- menu ---------- */
+      $("go-solo").onclick = function () { audio(); SFX.click(); beginRun("solo"); };
+      $("go-party").onclick = function () { audio(); SFX.click(); beginRun("party"); };
+      $("go-daily").onclick = function () { audio(); SFX.click(); beginRun("daily"); };
+
+      /* ---------- onboarding ---------- */
+      (function () {
+        var ob = $("ob"), track = $("ob-track"), dots = $("ob-dots").children, idx = 0;
+        $("ob-cheat").insertAdjacentHTML("beforeend", Object.keys(HANDS).map(function (k) {
+          var h = HANDS[k];
+          return "<div><span>" + h.name + '</span><u><span class="c">' + h.chips + '</span> × <span class="m">' + h.mult + "</span></u></div>";
+        }).join(""));
+        function setIdx(i) {
+          idx = Math.max(0, Math.min(3, i));
+          for (var d = 0; d < dots.length; d++) dots[d].classList.toggle("on", d === idx);
+          $("ob-next").textContent = idx === 3 ? "Let's go" : "Next";
+        }
+        // storage can be missing in the sandbox: keep an in-memory flag, and window.name lasts the tab session
+        function markSeen() {
+          window.__llOnboarded = true;
+          try { if (String(window.name).indexOf("ll-onboarded") < 0) window.name = (window.name ? window.name + " " : "") + "ll-onboarded"; } catch (e) {}
+          try { localStorage.setItem("ll-onboarded", "1"); } catch (e) {}
+        }
+        function close() {
+          ob.hidden = true;
+          markSeen();
+        }
+        function open(withCheat) {
+          $("ob-cheat").hidden = !withCheat;
+          ob.hidden = false;
+          track.scrollLeft = 0;
+          setIdx(0);
+        }
+        track.addEventListener("scroll", function () {
+          var w = track.clientWidth + 12;
+          if (w > 12) setIdx(Math.round(track.scrollLeft / w));
+        });
+        $("ob-next").onclick = function () {
+          SFX.click();
+          if (idx >= 3) return close();
+          setIdx(idx + 1);
+          track.scrollTo({ left: idx * (track.clientWidth + 12), behavior: "smooth" });
+        };
+        $("ob-skip").onclick = function () { SFX.click(); close(); };
+        $("help").onclick = function () { SFX.click(); open(true); };
+        document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !ob.hidden) close(); });
+        var seen = !!window.__llOnboarded;
+        try { if (String(window.name).indexOf("ll-onboarded") >= 0) seen = true; } catch (e) {}
+        try { if (localStorage.getItem("ll-onboarded") === "1") seen = true; } catch (e) {}
+        if (!seen) { markSeen(); open(false); }
+      })();
+    </script>
+    <style>
+      .x-on { position: fixed; inset: 0; z-index: 70; background: #0b0616ee; display: grid; place-items: center; padding: 16px; }
+      .x-on[hidden] { display: none; }
+      .x-on__card { width: min(420px, 100%); max-height: 100%; overflow: auto; border: 1px solid var(--x-line); border-radius: 20px; background: linear-gradient(180deg, var(--x-panel2), var(--x-panel)); padding: 18px; display: flex; flex-direction: column; gap: 10px; text-align: center; }
+      .x-on input { font: 600 16px/1 var(--sans); min-height: 44px; width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--x-line); background: #ffffff0a; color: #fff; text-align: center; }
+      .x-on__code { font: 800 56px/1 var(--sans); letter-spacing: 0.18em; color: var(--x-green); margin: 0; }
+      .x-on__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+      .x-on__list li { border: 1px solid var(--x-line); border-radius: 10px; padding: 8px; font-size: 14px; }
+      .x-on__msg { color: var(--x-pink); font-size: 14px; min-height: 1.2em; margin: 0; }
+      .x-toast { position: fixed; left: 50%; top: calc(16px + env(safe-area-inset-top)); transform: translateX(-50%); z-index: 80; background: #c2006d; color: #fff; padding: 10px 16px; border-radius: 99px; font: 700 14px/1.2 var(--sans); box-shadow: 0 0 24px #ff2d9555; }
+      .x-bot { position: relative; }
+      .x-pop { position: absolute; right: 4px; top: -8px; font-size: 20px; font-weight: 800; pointer-events: none; animation: floatup 1.3s ease-out forwards; }
+    </style>
+    <script>
+      /* ---------- online multiplayer (PeerJS) ---------- */
+      (function () {
+        var CH = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789", DOWN = "online's down rn — try Vs Bots";
+        var O = { peer: null, conn: null, host: false, conns: {}, code: "", name: "", map: {}, list: [], started: false, ended: false, pend: false, seed: 0, inRoom: false, rejected: false };
+        function rc(n) { var s = ""; for (var i = 0; i < n; i++) s += CH[Math.floor(Math.random() * CH.length)]; return s; }
+        function funName() {
+          var a = ["lowkey", "feral", "mid", "sigma", "goated", "unhinged", "cracked", "sleepy"], b = ["goblin", "dice", "rizzler", "unc", "gremlin", "npc", "bestie", "menace"];
+          return a[Math.floor(Math.random() * a.length)] + "_" + b[Math.floor(Math.random() * b.length)] + Math.floor(Math.random() * 90 + 10);
+        }
+        function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+        var ov = document.createElement("div");
+        ov.className = "x-on"; ov.hidden = true; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true"); ov.setAttribute("aria-label", "Play online");
+        document.querySelector(".x-app").appendChild(ov);
+        function view(h) { ov.innerHTML = '<div class="x-on__card"><p class="x-kicker">play online</p>' + h + "</div>"; ov.hidden = false; }
+        function toast(t) { var el = document.createElement("div"); el.className = "x-toast"; el.textContent = t; document.body.appendChild(el); setTimeout(function () { el.remove(); }, 2600); }
+        function err(msg) { view('<h2 class="x-title" style="font-size:32px">uh oh</h2><p class="x-dim">' + msg + '</p><button class="x-btn x-btn--big x-btn--ghost" data-a="back">Back</button>'); }
+        function menuView(msg) {
+          if (!O.name) O.name = funName();
+          view('<h2 class="x-title" style="font-size:36px">LOADED! online</h2><input id="x-name" maxlength="16" aria-label="Your name" value="' + esc(O.name) + '" />' +
+            '<button class="x-btn x-btn--big x-btn--pink" data-a="create">CREATE ROOM</button>' +
+            '<input id="x-code" maxlength="4" placeholder="CODE" aria-label="Room code" autocapitalize="characters" autocomplete="off" />' +
+            '<button class="x-btn x-btn--big x-btn--cyan" data-a="join">JOIN ROOM</button><p class="x-on__msg">' + (msg || "") + '</p>' +
+            '<button class="x-btn x-btn--ghost" data-a="close">Close</button>');
+        }
+        function readName() { var i = document.getElementById("x-name"); var n = i ? i.value.trim().slice(0, 16) : ""; O.name = n || O.name || funName(); }
+        function leave() {
+          try { if (O.peer) O.peer.destroy(); } catch (e) {}
+          O.peer = null; O.conn = null; O.conns = {}; O.map = {}; O.list = []; O.started = O.ended = O.inRoom = O.rejected = O.host = false;
+          if (S) S.online = false;
+          $("again").hidden = false;
+        }
+        function hostLeft(t) { toast(t || "host left 😭"); leave(); ov.hidden = true; $("fx").innerHTML = ""; show("s-menu"); }
+        function names() { return Object.keys(O.map).map(function (k) { return O.map[k].name; }); }
+        function bcast(m, except) { Object.keys(O.conns).forEach(function (k) { if (k !== except && O.conns[k].open) O.conns[k].send(m); }); }
+        function listView(ns) { return '<ul class="x-on__list">' + ns.map(function (n) { return "<li>" + esc(n) + (n === O.name ? " (you)" : "") + "</li>"; }).join("") + "</ul>"; }
+        function lobby() {
+          var ns = names();
+          bcast({ t: "lobby", names: ns, code: O.code });
+          view('<p class="x-dim">room code</p><p class="x-on__code">' + O.code + '</p><input id="x-inv" readonly aria-label="Invite text" value="join my LOADED! room: ' + O.code + '" />' +
+            '<button class="x-btn x-btn--ghost" data-a="copy">Copy Invite</button><p class="x-dim">' + ns.length + "/6 in the lobby</p>" + listView(ns) +
+            '<button class="x-btn x-btn--big x-btn--green" data-a="start"' + (ns.length < 2 ? " disabled" : "") + ">" + (ns.length < 2 ? "need 2+ to start" : "START") + '</button><button class="x-btn x-btn--ghost" data-a="back">Back</button>');
+        }
+        function create() {
+          readName();
+          if (!window.Peer) return err(DOWN);
+          leave(); O.host = true; O.code = rc(4);
+          view('<p class="x-dim">making a room…</p>');
+          var p = new Peer("loaded-" + O.code); O.peer = p;
+          p.on("open", function () { O.map = { host: { id: "host", name: O.name, round: 1, score: 0, coins: 4, alive: true, done: false } }; lobby(); });
+          p.on("connection", function (c) {
+            c.on("data", function (d) { hostMsg(c, d); });
+            c.on("close", function () { drop(c); });
+          });
+          p.on("error", function (e) {
+            if (O.peer !== p) return;
+            if (e.type === "unavailable-id") return create();
+            if (O.started) toast("connection lost 📡"); else { leave(); err("connection lost 📡"); }
+          });
+        }
+        function hostMsg(c, d) {
+          if (!d || !d.t) return;
+          if (d.t === "hi") {
+            var why = O.started ? "already started 🏃 wait for the next one" : names().length >= 6 ? "room full 🚪 (6 max)" : "";
+            if (why) { c.send({ t: "no", why: why }); return setTimeout(function () { c.close(); }, 400); }
+            var n = String(d.name || "player").slice(0, 16), base = n, k = 2;
+            while (names().indexOf(n) >= 0) n = base + k++;
+            O.conns[c.peer] = c;
+            O.map[c.peer] = { id: c.peer, name: n, round: 1, score: 0, coins: 4, alive: true, done: false };
+            c.send({ t: "ok", name: n });
+            lobby();
+          } else if (d.t === "st" && O.map[c.peer]) {
+            ["round", "score", "coins", "alive", "done"].forEach(function (f) { O.map[c.peer][f] = d[f]; });
+            boardOut();
+          } else if (d.t === "emo" && O.map[c.peer]) {
+            var m = { t: "emo", e: String(d.e).slice(0, 4), name: O.map[c.peer].name };
+            bcast(m, c.peer); pop(m.name, m.e);
+          }
+        }
+        function drop(c) {
+          if (!O.conns[c.peer]) return;
+          delete O.conns[c.peer];
+          if (O.started) { O.map[c.peer].dc = true; boardOut(); } else { delete O.map[c.peer]; lobby(); }
+        }
+        function boardOut() {
+          O.list = Object.keys(O.map).map(function (k) { return O.map[k]; });
+          bcast({ t: "board", list: O.list });
+          renderBoard(); checkEnd();
+        }
+        function checkEnd() {
+          if (O.ended || !O.list.every(function (p) { return p.dc || !p.alive || p.done; })) return;
+          O.ended = true; bcast({ t: "end", list: O.list }); endView(O.list);
+        }
+        function join() {
+          readName();
+          var code = (document.getElementById("x-code").value || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+          if (code.length !== 4 || code.split("").some(function (ch) { return CH.indexOf(ch) < 0; })) return menuView("codes are 4 letters/digits (no O, I, 0 or 1)");
+          if (!window.Peer) return err(DOWN);
+          leave(); O.code = code;
+          view('<p class="x-dim">joining ' + code + "…</p>");
+          var p = new Peer(); O.peer = p;
+          p.on("open", function () {
+            var c = p.connect("loaded-" + code, { reliable: true }); O.conn = c;
+            setTimeout(function () { if (O.peer === p && !c.open && !O.rejected) { leave(); err("room not found 🤷 check the code"); } }, 10000);
+            c.on("open", function () { O.inRoom = true; c.send({ t: "hi", name: O.name }); });
+            c.on("data", clientMsg);
+            c.on("close", function () { if (O.peer === p && !O.rejected && O.inRoom) hostLeft(); });
+          });
+          p.on("error", function (e) {
+            if (O.peer !== p || O.rejected) return;
+            if (e.type === "peer-unavailable") { leave(); err("room not found 🤷 check the code"); }
+            else if (O.inRoom) hostLeft("connection lost 📡"); else { leave(); err("connection lost 📡"); }
+          });
+        }
+        function clientMsg(d) {
+          if (!d || !d.t) return;
+          if (d.t === "ok") O.name = d.name;
+          else if (d.t === "no") { O.rejected = true; leave(); err(esc(d.why)); }
+          else if (d.t === "lobby") view('<p class="x-dim">room</p><p class="x-on__code">' + esc(d.code) + "</p>" + listView(d.names) + '<p class="x-dim">waiting for host…</p><button class="x-btn x-btn--ghost" data-a="back">Back</button>');
+          else if (d.t === "start") go(d.seed);
+          else if (d.t === "board") { O.list = d.list || []; renderBoard(); }
+          else if (d.t === "emo") pop(d.name, d.e);
+          else if (d.t === "end") { O.ended = true; endView(d.list || []); }
+        }
+        function startGame() {
+          O.seed = (Date.now() ^ (Math.random() * 1e9)) >>> 0;
+          Object.keys(O.map).forEach(function (k) {
+            if (O.map[k].dc) return delete O.map[k];
+            var p = O.map[k]; p.round = 1; p.score = 0; p.coins = 4; p.alive = true; p.done = false;
+          });
+          O.started = true; O.ended = false; O.list = Object.keys(O.map).map(function (k) { return O.map[k]; });
+          bcast({ t: "start", seed: O.seed }); go(O.seed);
+        }
+        function go(seed) {
+          O.seed = seed; O.ended = false; O.list = []; ov.hidden = true; $("fx").innerHTML = "";
+          O.pend = true; try { beginRun("party"); } finally { O.pend = false; }
+        }
+        function report() {
+          if (!S || !S.online) return;
+          var st = { round: S.round, score: Math.round(S.score), coins: S.coins, alive: !S.xOut, done: !!S.xDone };
+          if (O.host) { if (O.map.host) { for (var f in st) O.map.host[f] = st[f]; } boardOut(); }
+          else if (O.conn && O.conn.open) { st.t = "st"; st.name = O.name; O.conn.send(st); }
+        }
+        function pop(name, e) {
+          var rows = $("board").querySelectorAll(".x-bot"), row = null;
+          for (var i = 0; i < rows.length; i++) if (rows[i].dataset.n === name) row = rows[i];
+          if (!row) return emote(e, name);
+          var el = document.createElement("span"); el.className = "x-pop"; el.textContent = e;
+          if (e === "W") el.style.color = "var(--x-green)";
+          if (e === "L") el.style.color = "var(--x-pink)";
+          row.appendChild(el); setTimeout(function () { el.remove(); }, 1350);
+        }
+        function endView(list) {
+          var s = list.slice().sort(function (a, b) { return (!!b.done - !!a.done) || ((b.round || 0) - (a.round || 0)) || ((b.score || 0) - (a.score || 0)); });
+          var md = ["🥇", "🥈", "🥉"];
+          view('<h2 class="x-title" style="font-size:36px">GG 🎲</h2><ul class="x-on__list">' + s.slice(0, 3).map(function (p, i) {
+            return "<li>" + md[i] + " <b>" + esc(p.name) + "</b> · " + (p.done ? "cleared all 8" : "R" + p.round) + " · " + fmt(p.score || 0) + "</li>";
+          }).join("") + "</ul>" + (O.host ? '<button class="x-btn x-btn--big x-btn--green" data-a="start">REMATCH</button>' : '<p class="x-dim">waiting for host…</p>') +
+            '<button class="x-btn x-btn--ghost" data-a="menu">Leave room</button>');
+        }
+        var A = {
+          create: create, join: join, start: startGame,
+          back: function () { leave(); menuView(); },
+          close: function () { readName(); leave(); ov.hidden = true; },
+          menu: function () { leave(); ov.hidden = true; $("fx").innerHTML = ""; show("s-menu"); },
+          copy: function () {
+            var inp = document.getElementById("x-inv"), txt = inp.value;
+            function fb() { inp.focus(); inp.select(); try { document.execCommand("copy"); toast("copied 📋"); } catch (e) { toast("select + copy it 👆"); } }
+            if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function () { toast("invite copied 📋"); }, fb); else fb();
+          }
+        };
+        ov.addEventListener("click", function (e) { var b = e.target.closest("[data-a]"); if (b && !b.disabled && A[b.dataset.a]) { SFX.click(); A[b.dataset.a](); } });
+        // PeerJS loads with defer; if it isn't ready yet, wait up to 8s before calling it down
+        $("go-online").onclick = function () {
+          audio(); SFX.click();
+          if (window.Peer) return menuView();
+          view('<p class="x-dim">warming up online…</p>');
+          var t0 = Date.now();
+          (function wait() { if (window.Peer) return menuView(); if (Date.now() - t0 > 8000) return err(DOWN); setTimeout(wait, 200); })();
+        };
+
+        /* hooks into the existing run */
+        var _newRun = newRun;
+        newRun = function (mode) {
+          if (!O.pend) return _newRun(mode);
+          _newRun("solo");
+          S.mode = "party"; S.online = true; S.seed = O.seed; rng = mulberry32(O.seed);
+          S.players[0].name = O.name;
+        };
+        var _renderBoard = renderBoard;
+        renderBoard = function () {
+          if (!(S && S.online)) return _renderBoard();
+          var b = $("board"), L = O.list.slice(), me = null;
+          b.hidden = false;
+          L.forEach(function (p) { if (p.name === O.name) me = p; });
+          if (!me) { me = { name: O.name, alive: true }; L.push(me); }
+          if (!S.xOut && !S.xDone) { me.round = S.round; me.score = S.score; }
+          L.sort(function (a, c) { return ((!a.alive || a.dc) - (!c.alive || c.dc)) || (!!c.done - !!a.done) || ((c.round || 0) - (a.round || 0)) || ((c.score || 0) - (a.score || 0)); });
+          b.innerHTML = L.map(function (p, i) {
+            var out = !p.alive || p.dc, st = p.dc ? "dc · R" + p.round : !p.alive ? "💀 R" + p.round : (p.done ? "🏁 " : "R" + p.round + " · ") + "<u>" + fmt(Math.round(p.score || 0)) + "</u>";
+            return '<div class="x-bot' + (p === me ? " is-you" : "") + (out ? " is-out" : "") + '" data-n="' + esc(p.name) + '" title="' + esc(p.name) + '"><b>' + (i + 1) + ". " + esc(p.name) + "</b><span>" + st + "</span></div>";
+          }).join("");
+        };
+        var _clearRound = clearRound;
+        clearRound = function () { var r = _clearRound.apply(this, arguments); report(); return r; };
+        var _gameOver = gameOver;
+        gameOver = function (won) {
+          if (!(S && S.online)) { $("again").hidden = false; return _gameOver(won); }
+          S.xOut = !won; S.xDone = !!won;
+          _gameOver(won);
+          $("over-sub").textContent = $("over-sub").textContent.replace(/ · placed.*$/, "") + (O.ended ? "" : " · waiting on the lobby…");
+          $("again").hidden = true; $("endless").hidden = true;
+          report();
+        };
+        var _emit = net.emit;
+        net.emit = function (type, p) {
+          _emit(type, p);
+          if (!S || !S.online) return;
+          if (type === "hand") report();
+          if (type === "emote") {
+            pop(O.name, p.e);
+            var m = { t: "emo", e: p.e, name: O.name };
+            if (O.host) bcast(m); else if (O.conn && O.conn.open) O.conn.send(m);
+          }
+        };
+        window.addEventListener("beforeunload", function () { try { if (O.peer) O.peer.destroy(); } catch (e) {} });
+      })();
+    </script>
+  </body>
+</html>
