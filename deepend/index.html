@@ -1,134 +1,458 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#07171d">
-  <meta name="description" content="Dive deeper, dodge the undertow, stack a shell streak, and know when to surface. Solo or race your crew in Deep End.">
-  <title>Deep End — Harkade</title>
-  <link rel="preconnect" href="https://unpkg.com" crossorigin>
-  <link rel="stylesheet" href="style.css">
-  <script defer src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js" integrity="sha384-nlUQ8ZqCbvStErob+biJNzSgltf6urV3VGqhfIfzhmg9RXmpeRm76ELw0pYnKlTR" crossorigin="anonymous"></script>
-  <script defer src="game.js"></script>
-</head>
-<body>
-  <div class="ambient" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-  <main class="app">
-    <header class="topbar">
-      <a class="brand" href="#home" id="brandHome" aria-label="Deep End home">
-        <span class="brand-mark"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3C10 9 6 13 6 19a10 10 0 0 0 20 0c0-6-4-10-10-16Z"/><path d="M11 20c.6 2.2 2.2 3.4 4.6 3.7"/></svg></span>
-        <span>HARKADE <b>/</b> DEEP END</span>
-      </a>
-      <div class="top-meta"><span class="live-pill"><i></i> ARCADE RUNS</span><span class="meta-sep"></span><span>NO CASH. ALL CHAOS.</span></div>
-    </header>
-
-    <section id="home" class="home screen" aria-labelledby="mainTitle">
-      <div class="hero-copy">
-        <p class="eyebrow"><span class="eyebrow-star">✳</span> FROGGER TOOK A WRONG TURN</p>
-        <h1 id="mainTitle">DEEP<br><em>END</em><span class="title-dot">.</span></h1>
-        <p class="lede">The trench keeps moving. So do the odds.<br><strong>Dodge, loot, and surface before the sea says no.</strong></p>
-        <div class="rule-row"><span>01 / thread the current</span><span>02 / stack a streak</span><span>03 / cash out or get got</span></div>
-        <label class="field-label" for="nickname">YOUR DIVER TAG</label>
-        <input id="nickname" class="input name-input" maxlength="14" autocomplete="nickname" value="Diver" spellcheck="false">
-        <div class="home-actions">
-          <button id="playSolo" class="btn btn-primary"><span>SOLO DIVE</span><b aria-hidden="true">↘</b></button>
-          <button id="createRoom" class="btn btn-secondary"><span>OPEN A ROOM</span><b aria-hidden="true">＋</b></button>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#07171d" />
+    <meta
+      name="description"
+      content="Dive deeper, dodge the undertow, stack a shell streak, and know when to surface. Solo or race your crew in Deep End."
+    />
+    <title>Deep End — Harkade</title>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin />
+    <link rel="stylesheet" href="style.css" />
+    <script
+      defer
+      src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"
+      integrity="sha384-nlUQ8ZqCbvStErob+biJNzSgltf6urV3VGqhfIfzhmg9RXmpeRm76ELw0pYnKlTR"
+      crossorigin="anonymous"
+    ></script>
+    <script defer src="game.js"></script>
+  </head>
+  <body>
+    <div class="ambient" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <main class="app">
+      <header class="topbar">
+        <a class="brand" href="#home" id="brandHome" aria-label="Deep End home">
+          <span class="brand-mark"
+            ><svg viewBox="0 0 32 32" aria-hidden="true">
+              <path d="M16 3C10 9 6 13 6 19a10 10 0 0 0 20 0c0-6-4-10-10-16Z" />
+              <path d="M11 20c.6 2.2 2.2 3.4 4.6 3.7" /></svg
+          ></span>
+          <span>HARKADE <b>/</b> DEEP END</span>
+        </a>
+        <div class="top-meta">
+          <span class="live-pill"><i></i> ARCADE RUNS</span
+          ><span class="meta-sep"></span><span>NO CASH. ALL CHAOS.</span>
         </div>
-        <div class="join-row">
-          <input id="roomCode" class="input" maxlength="120" aria-label="Room code or invite link" placeholder="Room link or code" autocomplete="off" spellcheck="false">
-          <button id="joinRoom" class="btn btn-quiet">JOIN <span aria-hidden="true">↗</span></button>
+        <div class="top-tools" aria-label="Game settings">
+          <button
+            id="soundToggle"
+            class="utility-toggle"
+            type="button"
+            aria-pressed="true"
+          >
+            SOUND ON
+          </button>
+          <button
+            id="hapticsToggle"
+            class="utility-toggle"
+            type="button"
+            aria-pressed="false"
+            hidden
+          >
+            VIBRATION OFF
+          </button>
         </div>
-        <p id="homeNotice" class="notice" aria-live="polite"></p>
-        <p class="disclaimer"><span>ⓘ</span> Purely pretend shells. No real-money betting. Your bank survives a wipeout.</p>
-      </div>
-
-      <div class="hero-scene">
-        <div class="scene-topline"><span><i class="rec-dot"></i> LIVE FROM THE TRENCH</span><span>RUN No. 00<span id="previewRun">07</span></span></div>
-        <div class="scene-frame">
-          <canvas id="previewCanvas" aria-label="Animated preview of a diver dodging hazards and collecting pearls"></canvas>
-          <div class="scene-vignette" aria-hidden="true"></div>
-          <div class="scene-depth"><small>YOU ARE HERE</small><b>1,240 <span>m</span></b><i>↓ the deep end</i></div>
-          <div class="scene-loot"><span class="loot-glyph">✦</span><span><b>STREAK ×3</b><small>one more? 👀</small></span></div>
-          <div class="scene-scan" aria-hidden="true"></div>
-          <div class="scene-caption"><span>THE ABYSS IS CALLING</span><span>CAN YOU HEAR IT?</span></div>
-        </div>
-        <div class="preview-stats"><div><span>YOUR STASH</span><b><i>✦</i> <span id="homeBank">0</span></b></div><div><span>PERSONAL BEST</span><b id="homeBest">0 m</b></div><div><span>THE VIBE</span><b class="chaos">UNSTABLE <i>↗</i></b></div></div>
-      </div>
-      <div class="home-bottom">
-        <div class="howto"><span class="howto-label">HOW TO STAY ALIVE</span><span><kbd>WASD</kbd> / <kbd>← ↑ ↓ →</kbd> swim</span><span><kbd>SPACE</kbd> dash</span><span><kbd>C</kbd> cash out</span></div>
-        <div class="scroll-note">SCROLL LESS. DIVE MORE <span>↓</span></div>
-      </div>
-      <section class="upgrade-shelf" aria-label="Persistent diver upgrades">
-        <div class="upgrade-heading"><span>THE LOCKER</span><small>SPEND YOUR BANKED SHELLS · PERKS STICK</small></div>
-        <div class="upgrade-grid">
-          <button class="upgrade-card" data-upgrade="tank"><span class="upgrade-icon">◌</span><span><b>O₂ TANK</b><small>More air, more depth</small></span><strong id="tankPrice">✦ 35</strong><i id="tankLevel">LV 0</i></button>
-          <button class="upgrade-card" data-upgrade="hull"><span class="upgrade-icon">⬡</span><span><b>REINFORCED SUIT</b><small>One more hit to take</small></span><strong id="hullPrice">✦ 45</strong><i id="hullLevel">LV 0</i></button>
-          <button class="upgrade-card" data-upgrade="magnet"><span class="upgrade-icon">✧</span><span><b>PEARL MAGNET</b><small>Loot from a little farther</small></span><strong id="magnetPrice">✦ 40</strong><i id="magnetLevel">LV 0</i></button>
-        </div>
-      </section>
-    </section>
-
-    <section id="gameScreen" class="game-screen screen" hidden aria-label="Deep End game">
-      <header class="game-top">
-        <button id="leaveGame" class="back-button" aria-label="Leave game">←</button>
-        <div class="game-title"><span>HARKADE ORIGINAL / 02</span><b>DEEP END <i>·</i> <span id="modeLabel">SOLO DIVE</span></b></div>
-        <div id="connectionPill" class="connection-pill"><i></i><span>LOCAL RUN</span></div>
-        <button id="shareRoom" class="btn btn-quiet share-button" hidden>INVITE <span>↗</span></button>
       </header>
 
-      <section id="roomLobby" class="room-lobby" hidden aria-labelledby="lobbyTitle">
-        <div class="lobby-orbit" aria-hidden="true"><span>✦</span><i></i><i></i><i></i></div>
-        <p class="eyebrow">DEPTH IS BETTER WITH FRIENDS</p>
-        <h2 id="lobbyTitle">ROOM'S OPEN.<br><em>WHO'S IN?</em></h2>
-        <p class="lobby-copy">Send the link. Race your own dive, watch the live crew board, and compare who had the nerve to go deeper.</p>
-        <div class="invite-box"><span id="inviteText">making a signal…</span><button id="copyInvite" class="btn btn-quiet">COPY LINK ↗</button></div>
-        <div class="crew-wrap"><div class="section-label"><span>THE CREW</span><span id="lobbyCount">1 / 6</span></div><div id="lobbyRoster" class="lobby-roster"></div></div>
-        <button id="startRoom" class="btn btn-primary lobby-start">START THE DIVE <b>↘</b></button>
-        <p id="lobbyStatus" class="notice" aria-live="polite">Share the link and wait for your crew.</p>
+      <section id="home" class="home screen" aria-labelledby="mainTitle">
+        <div class="hero-copy">
+          <p class="eyebrow">
+            <span class="eyebrow-star">✳</span> FROGGER TOOK A WRONG TURN
+          </p>
+          <h1 id="mainTitle">
+            DEEP<br /><em>END</em><span class="title-dot">.</span>
+          </h1>
+          <p class="lede">
+            The trench keeps moving. So do the odds.<br /><strong
+              >Dodge, loot, and surface before the sea says no.</strong
+            >
+          </p>
+          <div class="rule-row">
+            <span>01 / thread the current</span><span>02 / stack a streak</span
+            ><span>03 / cash out or get got</span>
+          </div>
+          <label class="field-label" for="nickname">YOUR DIVER TAG</label>
+          <input
+            id="nickname"
+            class="input name-input"
+            maxlength="14"
+            autocomplete="nickname"
+            value="Diver"
+            spellcheck="false"
+          />
+          <p class="privacy-note">
+            Use a nickname — your diver tag is shared with everyone in your
+            room.
+          </p>
+          <div class="home-actions">
+            <button id="playSolo" class="btn btn-primary">
+              <span>SOLO DIVE</span><b aria-hidden="true">↘</b>
+            </button>
+            <button id="createRoom" class="btn btn-secondary">
+              <span>OPEN A ROOM</span><b aria-hidden="true">＋</b>
+            </button>
+          </div>
+          <div class="join-row">
+            <input
+              id="roomCode"
+              class="input"
+              maxlength="120"
+              aria-label="Room code or invite link"
+              placeholder="Room link or code"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <button id="joinRoom" class="btn btn-quiet">
+              JOIN <span aria-hidden="true">↗</span>
+            </button>
+          </div>
+          <p id="homeNotice" class="notice" aria-live="polite"></p>
+          <p class="disclaimer">
+            <span>ⓘ</span> Purely pretend shells. No real-money betting. Your
+            bank survives a wipeout.
+          </p>
+        </div>
+
+        <div class="hero-scene">
+          <div class="scene-topline">
+            <span><i class="rec-dot"></i> LIVE FROM THE TRENCH</span
+            ><span>RUN No. 00<span id="previewRun">07</span></span>
+          </div>
+          <div class="scene-frame">
+            <canvas
+              id="previewCanvas"
+              aria-label="Animated preview of a diver dodging hazards and collecting pearls"
+            ></canvas>
+            <div class="scene-vignette" aria-hidden="true"></div>
+            <div class="scene-depth">
+              <small>YOU ARE HERE</small><b>1,240 <span>m</span></b
+              ><i>↓ the deep end</i>
+            </div>
+            <div class="scene-loot">
+              <span class="loot-glyph">✦</span
+              ><span><b>STREAK ×3</b><small>one more? 👀</small></span>
+            </div>
+            <div class="scene-scan" aria-hidden="true"></div>
+            <div class="scene-caption">
+              <span>THE ABYSS IS CALLING</span><span>CAN YOU HEAR IT?</span>
+            </div>
+          </div>
+          <div class="preview-stats">
+            <div>
+              <span>YOUR STASH</span
+              ><b><i>✦</i> <span id="homeBank">0</span></b>
+            </div>
+            <div><span>PERSONAL BEST</span><b id="homeBest">0 m</b></div>
+            <div>
+              <span>THE VIBE</span><b class="chaos">UNSTABLE <i>↗</i></b>
+            </div>
+          </div>
+        </div>
+        <div class="home-bottom">
+          <div class="howto">
+            <span class="howto-label">HOW TO STAY ALIVE</span
+            ><span><kbd>WASD</kbd> / <kbd>← ↑ ↓ →</kbd> swim</span
+            ><span><kbd>SPACE</kbd> dash</span
+            ><span><kbd>C</kbd> cash out</span>
+          </div>
+          <div class="scroll-note">SCROLL LESS. DIVE MORE <span>↓</span></div>
+        </div>
+        <section class="upgrade-shelf" aria-label="Persistent diver upgrades">
+          <div class="upgrade-heading">
+            <span>THE LOCKER</span
+            ><small>SPEND YOUR BANKED SHELLS · PERKS STICK</small>
+          </div>
+          <div class="upgrade-grid">
+            <button class="upgrade-card" data-upgrade="tank">
+              <span class="upgrade-icon">◌</span
+              ><span><b>O₂ TANK</b><small>More air, more depth</small></span
+              ><strong id="tankPrice">✦ 35</strong><i id="tankLevel">LV 0</i>
+            </button>
+            <button class="upgrade-card" data-upgrade="hull">
+              <span class="upgrade-icon">⬡</span
+              ><span
+                ><b>REINFORCED SUIT</b><small>One more hit to take</small></span
+              ><strong id="hullPrice">✦ 45</strong><i id="hullLevel">LV 0</i>
+            </button>
+            <button class="upgrade-card" data-upgrade="magnet">
+              <span class="upgrade-icon">✧</span
+              ><span
+                ><b>PEARL MAGNET</b
+                ><small>Loot from a little farther</small></span
+              ><strong id="magnetPrice">✦ 40</strong
+              ><i id="magnetLevel">LV 0</i>
+            </button>
+          </div>
+        </section>
       </section>
 
-      <section id="arenaWrap" class="arena-wrap" hidden>
-        <div class="hud-row">
-          <div class="hud-card"><span>BANKED <small>SAFE</small></span><b><i>✦</i> <span id="bankedHud">0</span></b></div>
-          <div class="hud-card at-risk"><span>IN YOUR BAG <small>AT RISK</small></span><b><i>✧</i> <span id="lootHud">0</span></b><small id="streakHud">STREAK ×1</small></div>
-          <div class="hud-card depth-card"><span>DEPTH MULTIPLIER</span><b>×<span id="multiplierHud">1.0</span></b><small id="depthHud">0 m · SUNLIT ZONE</small></div>
-          <div class="oxygen-card"><span>O₂</span><div class="oxygen-track"><i id="oxygenFill"></i></div><b id="hullHud">♥ ♥</b></div>
-        </div>
-        <div class="playfield">
-          <canvas id="gameCanvas" aria-label="Underwater arcade game field. Use arrow keys or WASD to move, Space to dash, C to cash out."></canvas>
-          <div class="field-topline"><span id="runStatus"><i class="rec-dot"></i> DIVE LIVE</span><span id="zoneLabel">ZONE 01 / THE SUNLIT DROP</span></div>
-          <div id="depthTicker" class="depth-ticker"><span>DEPTH</span><b>000</b><i>m</i></div>
-          <div id="lootPop" class="loot-pop" aria-live="polite"></div>
-          <div class="field-bottomline"><span>← → MOVE</span><span>DON'T TOUCH THE GLOWY BITS</span><span>SPACE / DASH</span></div>
-        </div>
-        <div class="action-row">
-          <div class="action-help"><b id="actionCopy">Keep moving. The current gets meaner deeper down.</b><span>Cash out to bank your haul. Get tagged and this run's loot is gone.</span></div>
-          <button id="dashButton" class="btn btn-dash"><span class="dash-icon">⚡</span><span>DASH <small>SPACE</small></span><b id="dashCooldown">READY</b></button>
-          <button id="cashoutButton" class="btn btn-cashout"><span>⤴</span><span>SURFACE &amp; BANK<small>END THIS RUN SAFELY</small></span><b>✦</b></button>
-        </div>
-        <div class="under-stage">
-          <div class="crew-board"><div class="section-label"><span>LIVE CREW BOARD</span><span id="crewCount">1 DIVER</span></div><div id="crewBoard" class="crew-board-list"></div></div>
-          <div class="table-talk"><div class="section-label"><span>TABLE TALK</span><span>NO MIC. JUST VIBES.</span></div><div class="reaction-row"><button class="reaction" data-reaction="👀" aria-label="React eyes">👀</button><button class="reaction" data-reaction="💀" aria-label="React skull">💀</button><button class="reaction" data-reaction="🫡" aria-label="React salute">🫡</button><button class="reaction" data-reaction="🪼" aria-label="React jellyfish">🪼</button><div id="feed" class="feed" aria-live="polite">Waiting for the chaos…</div></div></div>
-        </div>
-        <div class="touch-controls" aria-label="Touch movement controls">
-          <button data-dir="up" aria-label="Swim up">▲</button><div><button data-dir="left" aria-label="Swim left">◀</button><button data-dir="down" aria-label="Swim down">▼</button><button data-dir="right" aria-label="Swim right">▶</button></div>
-          <small>HOLD TO SWIM</small>
-        </div>
-      </section>
-      <footer class="game-footer"><span>DEEP END <i>·</i> HARKADE</span><span>YOUR POCKET IS NOT OUR PROBLEM.</span></footer>
-    </section>
+      <section
+        id="gameScreen"
+        class="game-screen screen"
+        hidden
+        aria-label="Deep End game"
+      >
+        <header class="game-top">
+          <button id="leaveGame" class="back-button" aria-label="Leave game">
+            ←
+          </button>
+          <button
+            id="pauseButton"
+            class="back-button pause-button"
+            type="button"
+            aria-label="Pause dive"
+            aria-keyshortcuts="P Escape"
+            hidden
+          >
+            Ⅱ
+          </button>
+          <div class="game-title">
+            <span>HARKADE ORIGINAL / 02</span
+            ><b>DEEP END <i>·</i> <span id="modeLabel">SOLO DIVE</span></b>
+          </div>
+          <div id="connectionPill" class="connection-pill">
+            <i></i><span>LOCAL RUN</span>
+          </div>
+          <button id="shareRoom" class="btn btn-quiet share-button" hidden>
+            INVITE <span>↗</span>
+          </button>
+        </header>
 
-    <div id="resultModal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="resultTitle">
-      <div class="modal-card">
-        <div class="result-badge" id="resultBadge">SURFACED</div>
-        <h2 id="resultTitle">That's a clean exit.</h2>
-        <p id="resultCopy" class="result-copy"></p>
-        <div id="resultRows" class="result-rows"></div>
-        <div class="result-actions"><button id="againButton" class="btn btn-primary">ONE MORE DIVE <b>↘</b></button><button id="homeButton" class="btn btn-quiet">BACK TO SURFACE</button></div>
-        <p id="waitingCopy" class="waiting-copy" hidden>Waiting for the rest of the crew to surface…</p>
+        <section
+          id="roomLobby"
+          class="room-lobby"
+          hidden
+          aria-labelledby="lobbyTitle"
+        >
+          <div class="lobby-orbit" aria-hidden="true">
+            <span>✦</span><i></i><i></i><i></i>
+          </div>
+          <p class="eyebrow">DEPTH IS BETTER WITH FRIENDS</p>
+          <h2 id="lobbyTitle">ROOM'S OPEN.<br /><em>WHO'S IN?</em></h2>
+          <p class="lobby-copy">
+            Send the link. Race your own dive, watch the live crew board, and
+            compare who had the nerve to go deeper.
+          </p>
+          <div class="invite-box">
+            <span id="inviteText">making a signal…</span
+            ><button id="copyInvite" class="btn btn-quiet">COPY LINK ↗</button>
+          </div>
+          <div class="crew-wrap">
+            <div class="section-label">
+              <span>THE CREW</span><span id="lobbyCount">1 / 6</span>
+            </div>
+            <div id="lobbyRoster" class="lobby-roster"></div>
+          </div>
+          <button id="startRoom" class="btn btn-primary lobby-start">
+            START THE DIVE <b>↘</b>
+          </button>
+          <p id="lobbyStatus" class="notice" aria-live="polite">
+            Share the link and wait for your crew.
+          </p>
+        </section>
+
+        <section id="arenaWrap" class="arena-wrap" hidden>
+          <div class="hud-row">
+            <div class="hud-card">
+              <span>BANKED <small>SAFE</small></span
+              ><b><i>✦</i> <span id="bankedHud">0</span></b>
+            </div>
+            <div class="hud-card at-risk">
+              <span>IN YOUR BAG <small>AT RISK</small></span
+              ><b><i>✧</i> <span id="lootHud">0</span></b
+              ><small id="streakHud">STREAK ×1</small>
+            </div>
+            <div class="hud-card depth-card">
+              <span>DEPTH MULTIPLIER</span
+              ><b>×<span id="multiplierHud">1.0</span></b
+              ><small id="depthHud">0 m · SUNLIT ZONE</small>
+            </div>
+            <div class="oxygen-card">
+              <span>O₂</span>
+              <div
+                id="oxygenTrack"
+                class="oxygen-track"
+                role="progressbar"
+                aria-label="Oxygen"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow="100"
+              >
+                <i id="oxygenFill"></i>
+              </div>
+              <b id="hullHud" aria-label="Suit integrity">♥ ♥</b>
+            </div>
+          </div>
+          <div class="playfield">
+            <canvas
+              id="gameCanvas"
+              aria-label="Underwater arcade game field. Drag or swipe to steer, or use the directional controls. Use Space to dash and C to surface."
+              aria-describedby="gameInstructions"
+            ></canvas>
+            <div class="field-topline">
+              <span id="runStatus"><i class="rec-dot"></i> DIVE LIVE</span
+              ><span id="zoneLabel">ZONE 01 / THE SUNLIT DROP</span>
+            </div>
+            <div id="depthTicker" class="depth-ticker">
+              <span>DEPTH</span><b>000</b><i>m</i>
+            </div>
+            <div id="lootPop" class="loot-pop" aria-hidden="true"></div>
+            <div class="field-bottomline">
+              <span>← → MOVE</span><span>DON'T TOUCH THE GLOWY BITS</span
+              ><span>SPACE / DASH</span>
+            </div>
+          </div>
+          <div class="action-row">
+            <div class="action-help">
+              <b id="actionCopy"
+                >Keep moving. The current gets meaner deeper down.</b
+              ><span
+                >Cash out to bank your haul. Get tagged and this run's loot is
+                gone.</span
+              >
+            </div>
+            <button id="dashButton" class="btn btn-dash">
+              <span class="dash-icon">⚡</span
+              ><span>DASH <small>SPACE</small></span
+              ><b id="dashCooldown">READY</b>
+            </button>
+            <button id="cashoutButton" class="btn btn-cashout">
+              <span>⤴</span
+              ><span>SURFACE &amp; BANK<small>END THIS RUN SAFELY</small></span
+              ><b>✦</b>
+            </button>
+          </div>
+          <div class="under-stage">
+            <div class="crew-board">
+              <div class="section-label">
+                <span>LIVE CREW BOARD</span><span id="crewCount">1 DIVER</span>
+              </div>
+              <div id="crewBoard" class="crew-board-list"></div>
+            </div>
+            <div class="table-talk">
+              <div class="section-label">
+                <span>TABLE TALK</span><span>NO MIC. JUST VIBES.</span>
+              </div>
+              <div class="reaction-row">
+                <button
+                  class="reaction"
+                  data-reaction="👀"
+                  aria-label="React eyes"
+                >
+                  👀</button
+                ><button
+                  class="reaction"
+                  data-reaction="💀"
+                  aria-label="React skull"
+                >
+                  💀</button
+                ><button
+                  class="reaction"
+                  data-reaction="🫡"
+                  aria-label="React salute"
+                >
+                  🫡</button
+                ><button
+                  class="reaction"
+                  data-reaction="🪼"
+                  aria-label="React jellyfish"
+                >
+                  🪼
+                </button>
+                <div id="feed" class="feed" aria-live="polite">
+                  Waiting for the chaos…
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="touch-controls"
+            role="group"
+            aria-label="Touch movement controls"
+          >
+            <button type="button" data-dir="up" aria-label="Swim up">▲</button>
+            <div>
+              <button data-dir="left" aria-label="Swim left">◀</button
+              ><button data-dir="down" aria-label="Swim down">▼</button
+              ><button data-dir="right" aria-label="Swim right">▶</button>
+            </div>
+            <small>HOLD TO SWIM</small>
+          </div>
+        </section>
+        <footer class="game-footer">
+          <span>DEEP END <i>·</i> HARKADE</span
+          ><span>YOUR POCKET IS NOT OUR PROBLEM.</span>
+        </footer>
+      </section>
+
+      <div id="gameInstructions" class="sr-only">
+        Steer with arrow keys, WASD, the on-screen direction pad, or by dragging
+        on the play area. Dash with Space or the Dash button. Surface at any
+        time to bank your loose shells. Pause with P or Escape.
       </div>
-    </div>
-    <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  </main>
-</body>
+      <div
+        id="gameAnnouncer"
+        class="sr-only"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      ></div>
+      <div
+        id="pauseModal"
+        class="modal"
+        hidden
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="pauseTitle"
+      >
+        <div class="modal-card pause-card">
+          <div class="result-badge">DIVE ON HOLD</div>
+          <h2 id="pauseTitle">Take a breath.</h2>
+          <p class="result-copy">
+            Your dive is paused. Your loose shells are still at risk until you
+            surface.
+          </p>
+          <div class="result-actions">
+            <button id="resumeButton" class="btn btn-primary" type="button">
+              BACK IN THE WATER <b>↘</b>
+            </button>
+            <button id="pauseHomeButton" class="btn btn-quiet" type="button">
+              LEAVE THIS DIVE
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        id="resultModal"
+        class="modal"
+        hidden
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="resultTitle"
+      >
+        <div class="modal-card">
+          <div class="result-badge" id="resultBadge">SURFACED</div>
+          <h2 id="resultTitle">That's a clean exit.</h2>
+          <p id="resultCopy" class="result-copy"></p>
+          <div id="resultRows" class="result-rows"></div>
+          <div class="result-actions">
+            <button id="againButton" class="btn btn-primary">
+              ONE MORE DIVE <b>↘</b></button
+            ><button id="homeButton" class="btn btn-quiet">
+              BACK TO SURFACE
+            </button>
+          </div>
+          <p id="waitingCopy" class="waiting-copy" hidden>
+            Waiting for the rest of the crew to surface…
+          </p>
+        </div>
+      </div>
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    </main>
+  </body>
 </html>
