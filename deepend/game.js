@@ -1862,10 +1862,7 @@
       "aria-valuetext",
       `${oxygenPercent}% oxygen`,
     );
-    $("#oxygenFill").style.background =
-      run.oxygen < 25
-        ? "#ed8c66"
-        : "#9dd5c8";
+    $("#oxygenFill").style.background = run.oxygen < 25 ? "#ed8c66" : "#9dd5c8";
     $("#hullHud").textContent =
       "♥ ".repeat(Math.max(0, run.hull)).trim() || "♡";
     $("#depthTicker b").textContent = String(meters).padStart(3, "0");
