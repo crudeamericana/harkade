@@ -7,6 +7,7 @@ Browser games, deployed as a static site on Vercel (no build step).
 - **LOADED!** (`/loaded/`): roll dice. stack charms. get loaded. A Yahtzee x Balatro dice roguelite with charms, mystery boxes, boss rounds, a Daily Run, Vs Bots, and online rooms via PeerJS room codes.
 - **DEEP END** (`/deepend/`): shared-field Minesweeper meets push-your-luck, with solo rivals, PeerJS room links, reactions, and a four-depth score race.
 - **GHOST CIRCUIT** (`/ghost-circuit/`): one-thumb oval racing where your past laps return as moving hazards; bank fictional shells or push the multiplier, solo or in PeerJS rooms.
+- **HIVEMIND** (`/hivemind/`): OpenFront-style territory war between 16 AI agent swarms on a circuit-board map, with VIRUS and FIREWALL abilities, bot diplomacy and betrayals, a final showdown, and up to 16 players online via PeerJS Quick Match or room codes.
 
 ## Deploy
 
