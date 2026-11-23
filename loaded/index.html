@@ -466,7 +466,7 @@
           <div class="x-hud">
             <div class="x-cell"><b id="h-round">1/8</b><span>Round</span></div>
             <div class="x-cell"><b id="h-hands">4</b><span>Hands</span></div>
-            <div class="x-cell"><b id="h-rerolls">3</b><span>Rerolls</span></div>
+            <div class="x-cell"><b id="h-rerolls">2</b><span>Rerolls</span></div>
             <div class="x-cell"><b id="h-coins">$0</b><span>Bag</span></div>
           </div>
           <div class="x-goal" id="goal">
@@ -487,7 +487,7 @@
               <div class="x-dice" id="dice"></div>
             </div>
             <div class="x-row x-row--fill">
-              <button class="x-btn x-btn--cyan" id="btn-reroll">Reroll · 3</button>
+              <button class="x-btn x-btn--cyan" id="btn-reroll">Reroll · 2</button>
               <button class="x-btn x-btn--pink" id="btn-play">Play hand</button>
             </div>
           </div>
@@ -534,7 +534,7 @@
             </div>
             <div class="x-ob__card">
               <div class="x-ob__art"><span class="x-mini tum">2</span><span class="x-mini tum">5</span><span class="x-ob__play">PLAY</span></div>
-              <p>Reroll the rest, then <b>PLAY</b> your best hand.</p>
+              <p>Reroll the rest (2 rerolls every hand), then <b>PLAY</b> your best hand.</p>
             </div>
             <div class="x-ob__card">
               <div class="x-ob__art"><span class="x-count"><span class="c">40</span><small class="x-dim">×</small><span class="m">4</span><small class="x-dim">=</small><span class="x-roll"><span><i>0</i><i>40</i><i>80</i><i>120</i><i>160</i></span></span></span></div>
@@ -619,7 +619,7 @@
     <script>
       /* ---------- data ---------- */
       // pass 2 curve (was 300, 800, 2000, 5000, 11000, 25000, 50000, 100000): R1-2 onboarding, R3 first wall, ~1.4-2.4x steps after
-      var TARGETS = [250, 600, 1500, 3500, 5500, 8500, 12000, 16000];
+      var TARGETS = [200, 450, 700, 1100, 1700, 2600, 3800, 5500];
       var HANDS = {
         five: { name: "Five of a kind", chips: 100, mult: 12, tag: "SLAY", rank: 8 },
         quads: { name: "Quads", chips: 60, mult: 7, tag: "no cap", rank: 7 },
@@ -633,7 +633,7 @@
       };
       var CURSES = [
         { id: "sixes", text: "☠ Curse: sixes score 0" },
-        { id: "onereroll", text: "☠ Curse: only 1 reroll" },
+        { id: "onereroll", text: "☠ Curse: only 1 reroll per hand" },
         { id: "nohold", text: "☠ Curse: no holding" }
       ];
       var RARITY = {
@@ -672,7 +672,7 @@
       var S = null;
       function targetFor(round) {
         if (round <= 8) return TARGETS[round - 1];
-        return Math.round(TARGETS[7] * Math.pow(2.2, round - 8));
+        return Math.round(TARGETS[7] * Math.pow(1.8, round - 8));
       }
       function today() { var d = new Date(); return { n: d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate(), md: d.getMonth() + 1 + "/" + d.getDate() }; }
       function curseFor(r) { if (!S.curses[r]) S.curses[r] = pick(CURSES); return S.curses[r]; }
@@ -692,7 +692,7 @@
           bonusRerolls: 0,
           score: 0,
           hands: 4,
-          rerolls: 3,
+          rerolls: 2,
           curse: null,
           dice: [],
           heat: 0,
@@ -854,12 +854,13 @@
 
       /* ---------- round loop ---------- */
       var busy = false;
+      function handRerolls() { return S.curse && S.curse.id === "onereroll" ? 1 : 2 + (S.bonusRerolls || 0); }
       function startRound() {
         var boss = S.round % 3 === 0;
         S.curse = boss ? curseFor(S.round) : null;
         S.score = 0;
         S.hands = 4 + S.bonusHands + has("rent").length;
-        S.rerolls = S.curse && S.curse.id === "onereroll" ? 1 : 3 + S.bonusRerolls;
+        S.rerolls = handRerolls();
         S.dice = [0, 0, 0, 0, 0].map(function () { return { v: 1, held: false, gold: false }; });
         show("s-game");
         $("calc").innerHTML = boss ? '<span class="m">BOSS</span>' : "";
@@ -1055,6 +1056,7 @@
           }
           return gameOver(false);
         }
+        S.rerolls = handRerolls();
         rollDice(true);
         renderHUD();
       }
@@ -1440,7 +1442,7 @@
           var better = S.players.filter(function (p) { return p.isBot && (won ? p.round > 8 && !p.out : p.round > S.round || (p.round === S.round && !p.out)); }).length;
           place = " · placed #" + (better + 1) + " of 4";
         }
-        $("over-sub").textContent = won ? "All 8 rounds cleared. Endless is open, targets x2.2 each round." : "Busted on round " + S.round + " (target " + fmt(targetFor(S.round)) + ")" + place;
+        $("over-sub").textContent = won ? "All 8 rounds cleared. Endless is open, targets x1.8 each round." : "Busted on round " + S.round + " (target " + fmt(targetFor(S.round)) + ")" + place;
         if (S.day) $("over-sub").textContent = "Daily · " + S.day + " · " + $("over-sub").textContent;
         var st = S.stats, reached = won ? "8 ✅" : S.round + (S.endless ? "∞" : "");
         var cells = [
@@ -1475,7 +1477,7 @@
         S.endless = true;
         S.round = 9;
         SFX.click();
-        openShop("Endless mode. Targets x2.2 every round.");
+        openShop("Endless mode. Targets x1.8 every round.");
       };
 
       /* ---------- wheel ---------- */
@@ -1524,7 +1526,7 @@
         if (w.id === "c3") { S.coins += 3; msg = "+$3. Small W."; }
         if (w.id === "c5") { S.coins += 5; msg = "+$5. Bet."; }
         if (w.id === "hand") { S.bonusHands += 1; msg = "+1 hand every round this run."; }
-        if (w.id === "reroll") { S.bonusRerolls += 1; msg = "+1 reroll every round this run."; }
+        if (w.id === "reroll") { S.bonusRerolls += 1; msg = "+1 reroll every hand this run."; }
         if (w.id === "rare") {
           var c = randomCharmByRarity("rare");
           S.charms.push({ id: c.id, stack: 0 });
